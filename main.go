@@ -10,6 +10,9 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/article"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/belanja"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/kuliner"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/wisata"
 	"github.com/weeber-id/desatanjungbunga-backend/src/services"
 	"github.com/weeber-id/desatanjungbunga-backend/src/variables"
 )
@@ -44,6 +47,24 @@ func main() {
 			admin.POST("/article/create", article.Create)
 			admin.POST("/article/update", article.Update)
 			admin.POST("/article/delete", article.Delete)
+
+			admin.GET("/travel", wisata.GetOne)
+			admin.GET("/travels", wisata.GetMultiple)
+			admin.POST("/travel/create", wisata.Create)
+			admin.POST("/travel/update", wisata.Update)
+			admin.POST("/travel/delete", wisata.Delete)
+
+			admin.GET("/shopping", belanja.GetOne)
+			admin.GET("/shoppings", belanja.GetMultiple)
+			admin.POST("/shopping/create", belanja.Create)
+			admin.POST("/shopping/update", belanja.Update)
+			admin.POST("/shopping/delete", belanja.Delete)
+
+			admin.GET("/culinary", kuliner.GetOne)
+			admin.GET("/culinaries", kuliner.GetMultiple)
+			admin.POST("/culinary/create", kuliner.Create)
+			admin.POST("/culinary/update", kuliner.Update)
+			admin.POST("/culinary/delete", kuliner.Delete)
 		}
 	}
 
