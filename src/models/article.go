@@ -83,6 +83,8 @@ func (a *Article) Delete(ctx context.Context) error {
 
 // Articles multiple model
 type Articles struct {
+	baseList
+
 	data []Article
 }
 
@@ -91,12 +93,29 @@ func (Articles) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Article)
 }
 
-// Get multiple article fomr database
+// SortByTitle asc or desc
+func (a *Articles) SortByTitle(direction string) {
+	numDirection := a.getDirectionFromStringToInt(direction)
+	a.sort = append(a.sort, bson.E{Key: "title", Value: numDirection})
+}
+
+// SortByDate asc (oldest) or desc (latest)
+func (a *Articles) SortByDate(direction string) {
+	numDirection := a.getDirectionFromStringToInt(direction)
+	a.sort = append(a.sort, bson.E{Key: "updated_at", Value: numDirection})
+}
+
+// Get multiple article from database
 func (a *Articles) Get(ctx context.Context) error {
 	filter := bson.D{}
 
 	opt := options.Find()
-	opt.SetSort(bson.M{"_id": -1})
+	opt.SetSort(append(
+		a.sort,
+		bson.E{Key: "_id", Value: -1},
+	))
+	opt.SetSkip(a.pagination.skip)
+	opt.SetLimit(a.pagination.limit)
 
 	cur, err := a.Collection().Find(ctx, filter, opt)
 	if err != nil {
@@ -105,8 +124,9 @@ func (a *Articles) Get(ctx context.Context) error {
 
 	for cur.Next(ctx) {
 		var art Article
-
 		cur.Decode(&art)
+
+		art.Body = ""
 		a.data = append(a.data, art)
 	}
 

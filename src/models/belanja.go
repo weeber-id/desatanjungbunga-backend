@@ -75,7 +75,7 @@ func (MultipleBelanja) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Belanja)
 }
 
-// Get multiple belanja fomr database
+// Get multiple belanja from database
 func (b *MultipleBelanja) Get(ctx context.Context) error {
 	filter := bson.D{}
 

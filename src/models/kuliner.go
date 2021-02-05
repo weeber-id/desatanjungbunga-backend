@@ -75,7 +75,7 @@ func (MultipleKuliner) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Kuliner)
 }
 
-// Get multiple kuliner fomr database
+// Get multiple kuliner from database
 func (k *MultipleKuliner) Get(ctx context.Context) error {
 	filter := bson.D{}
 

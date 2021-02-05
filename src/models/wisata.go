@@ -76,7 +76,7 @@ func (MultipleWisata) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Wisata)
 }
 
-// Get multiple wisata fomr database
+// Get multiple wisata from database
 func (w *MultipleWisata) Get(ctx context.Context) error {
 	filter := bson.D{}
 
