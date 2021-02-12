@@ -11,6 +11,7 @@ import (
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/article"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/belanja"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/discussion"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/kuliner"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/wisata"
 	"github.com/weeber-id/desatanjungbunga-backend/src/services"
@@ -65,6 +66,10 @@ func main() {
 			admin.POST("/culinary/create", kuliner.Create)
 			admin.POST("/culinary/update", kuliner.Update)
 			admin.POST("/culinary/delete", kuliner.Delete)
+
+			admin.GET("/discussion", discussion.GetMultiple)
+			admin.POST("/discussion/create", discussion.Create)
+			admin.POST("/discussion/delete", discussion.Delete)
 		}
 	}
 
