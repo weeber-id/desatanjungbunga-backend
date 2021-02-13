@@ -11,6 +11,7 @@ import (
 func GetMultiple(c *gin.Context) {
 	var request struct {
 		ParentID       *string `form:"question_id"`
+		ShowQuestion   bool    `form:"show_question"`
 		SortDate       *string `form:"sort_date"`
 		Page           *int64  `form:"page"`
 		ContentPerPage *int64  `form:"content_per_page"`
@@ -33,7 +34,7 @@ func GetMultiple(c *gin.Context) {
 		discussion.FilterOnlyQuestion()
 	}
 
-	if err := discussion.Get(c); err != nil {
+	if err := discussion.Get(c, request.ShowQuestion); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}

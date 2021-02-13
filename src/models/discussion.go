@@ -20,6 +20,8 @@ type Discussion struct {
 	Name     string             `bson:"name" json:"name"`
 	Email    string             `bson:"email" json:"email"`
 	Body     string             `bson:"body" json:"body"`
+
+	Questions []Discussion `bson:"-" json:"questions"`
 }
 
 // Collection pointor to this model
@@ -70,6 +72,21 @@ func (d *Discussion) GetByID(ctx context.Context, id string) (found bool, err er
 	return d.IsFoundFromError(err), err
 }
 
+// GetQuestions for this discussion
+func (d *Discussion) GetQuestions(ctx context.Context) error {
+	cur, err := d.Collection().Find(ctx, bson.M{"parent_id": d.ID}, options.Find())
+	if err != nil {
+		return err
+	}
+
+	for cur.Next(ctx) {
+		var question Discussion
+		cur.Decode(&question)
+		d.Questions = append(d.Questions, question)
+	}
+	return nil
+}
+
 // Update discussion to database
 func (d *Discussion) Update(ctx context.Context) error {
 	d.UpdatedAt = time.Now()
@@ -116,11 +133,11 @@ func (d *Discussions) FilterOnlyAnswer(parentID string) {
 }
 
 // Get from discussion from database
-func (d *Discussions) Get(ctx context.Context) error {
+func (d *Discussions) Get(ctx context.Context, showQuestion bool) error {
 	opt := options.Find()
 	opt.SetSort(append(
 		d.sort,
-		bson.E{Key: "_id", Value: 1},
+		bson.E{Key: "_id", Value: -1},
 	))
 	opt.SetSkip(d.pagination.skip)
 	opt.SetLimit(d.pagination.limit)
@@ -133,6 +150,14 @@ func (d *Discussions) Get(ctx context.Context) error {
 	for cur.Next(ctx) {
 		var question Discussion
 		cur.Decode(&question)
+
+		if showQuestion {
+			err := question.GetQuestions(ctx)
+			if err != nil {
+				return err
+			}
+		}
+
 		d.data = append(d.data, question)
 	}
 
