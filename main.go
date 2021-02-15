@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/account"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/article"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/belanja"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/discussion"
@@ -40,9 +41,12 @@ func main() {
 	root := router.Group("/api")
 	{
 		root.GET("/", controllers.HealthCheck)
+		root.POST("/login", account.AdminLogin)
 
 		admin := root.Group("/admin")
 		{
+			admin.POST("/register", account.AdminCreate)
+
 			admin.GET("/article", article.GetOne)
 			admin.GET("/articles", article.GetMultiple)
 			admin.POST("/article/create", article.Create)
