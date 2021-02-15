@@ -15,6 +15,7 @@ import (
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/discussion"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/kuliner"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/wisata"
+	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
 	"github.com/weeber-id/desatanjungbunga-backend/src/services"
 	"github.com/weeber-id/desatanjungbunga-backend/src/variables"
 )
@@ -42,8 +43,10 @@ func main() {
 	{
 		root.GET("/", controllers.HealthCheck)
 		root.POST("/login", account.AdminLogin)
+		root.POST("/logout", account.AdminLogut)
 
 		admin := root.Group("/admin")
+		admin.Use(middlewares.AdminAuthorization())
 		{
 			admin.POST("/register", account.AdminCreate)
 

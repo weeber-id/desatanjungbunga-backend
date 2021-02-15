@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
 	"github.com/weeber-id/desatanjungbunga-backend/src/models"
 )
 
@@ -31,8 +32,17 @@ func AdminLogin(c *gin.Context) {
 		return
 	}
 
+	middlewares.WriteAccessToken2Cookie(c, admin.ID.Hex(), admin.Role)
+
 	c.JSON(http.StatusOK, gin.H{
 		"message": "login success",
 		"data":    admin,
 	})
+}
+
+// AdminLogut controller
+func AdminLogut(c *gin.Context) {
+	middlewares.DeleteAccessToken2Cookie(c)
+
+	c.JSON(http.StatusOK, gin.H{"message": "admin logout"})
 }

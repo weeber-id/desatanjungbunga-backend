@@ -1,6 +1,7 @@
 package variables
 
 import (
+	"errors"
 	"io/ioutil"
 	"log"
 	"os"
@@ -26,6 +27,11 @@ var MongoConfig struct {
 // JWTConfig datatype
 var JWTConfig struct {
 	Key string
+
+	TokenName string
+	Path      string
+	Domain    string
+	HTTPS     bool
 }
 
 // InitializationVariable environment
@@ -48,4 +54,13 @@ func InitializationVariable() {
 	MongoConfig.Database = os.Getenv("MONGO_DATABASE")
 
 	JWTConfig.Key = os.Getenv("JWT_SECRET_KEY")
+	JWTConfig.TokenName = "auth_token"
+	switch Mode {
+	case "development":
+		JWTConfig.Domain = "localhost:8080"
+		JWTConfig.Path = "/api"
+		JWTConfig.HTTPS = false
+	default:
+		log.Fatal(errors.New("Invalid MODE, must be: local, staging, production"))
+	}
 }
