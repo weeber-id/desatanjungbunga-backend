@@ -24,7 +24,8 @@ func InitializationMongo(ctx context.Context) *mongo.Client {
 	config := variables.MongoConfig
 
 	URI := fmt.Sprintf(
-		"mongodb://%s:%s@%s/%s",
+		"%s://%s:%s@%s/%s?retryWrites=true&w=majority",
+		config.Connector,
 		config.User,
 		config.Password,
 		config.Host,

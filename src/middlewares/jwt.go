@@ -63,13 +63,13 @@ func WriteAccessToken2Cookie(c *gin.Context, adminID string, role int) {
 
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     jwtConfig.TokenName,
-		Value:    token,
-		SameSite: 4, // None
-		MaxAge:   3600 * 24,
-		HttpOnly: true,
+		SameSite: jwtConfig.SameSite,
+		MaxAge:   jwtConfig.MaxAge,
+		HttpOnly: jwtConfig.HTTPOnly,
 		Path:     jwtConfig.Path,
 		Domain:   jwtConfig.Domain,
 		Secure:   jwtConfig.HTTPS,
+		Value:    token,
 	})
 }
 
@@ -79,12 +79,12 @@ func DeleteAccessToken2Cookie(c *gin.Context) {
 
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:     jwtConfig.TokenName,
-		Value:    "",
-		SameSite: 4, // None
-		MaxAge:   0,
-		HttpOnly: true,
+		SameSite: jwtConfig.SameSite,
+		HttpOnly: jwtConfig.HTTPOnly,
 		Path:     jwtConfig.Path,
 		Domain:   jwtConfig.Domain,
 		Secure:   jwtConfig.HTTPS,
+		MaxAge:   -1,
+		Value:    "",
 	})
 }

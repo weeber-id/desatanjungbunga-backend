@@ -4,6 +4,7 @@ import (
 	"errors"
 	"io/ioutil"
 	"log"
+	"net/http"
 	"os"
 )
 
@@ -18,6 +19,8 @@ var (
 
 // MongoConfig data type
 var MongoConfig struct {
+	Connector string
+
 	Host     string
 	Database string
 	User     string
@@ -32,6 +35,9 @@ var JWTConfig struct {
 	Path      string
 	Domain    string
 	HTTPS     bool
+	HTTPOnly  bool
+	MaxAge    int
+	SameSite  http.SameSite
 }
 
 // InitializationVariable environment
@@ -55,12 +61,39 @@ func InitializationVariable() {
 
 	JWTConfig.Key = os.Getenv("JWT_SECRET_KEY")
 	JWTConfig.TokenName = "auth_token"
+	JWTConfig.HTTPOnly = true
+	JWTConfig.MaxAge = 24 * 3600
+
 	switch Mode {
 	case "development":
-		JWTConfig.Domain = "localhost:8080"
-		JWTConfig.Path = "/api"
+		MongoConfig.Connector = "mongodb"
+		JWTConfig.Domain = "localhost"
+		JWTConfig.Path = "/"
 		JWTConfig.HTTPS = false
+		JWTConfig.SameSite = http.SameSiteNoneMode
+
+	case "staging-local":
+		MongoConfig.Connector = "mongodb+srv"
+		JWTConfig.Domain = "localhost"
+		JWTConfig.Path = "/"
+		JWTConfig.HTTPS = true
+		JWTConfig.SameSite = http.SameSiteNoneMode
+
+	case "staging":
+		MongoConfig.Connector = "mongodb+srv"
+		JWTConfig.Domain = "staging-tanjungbunga.weeber.id"
+		JWTConfig.Path = "/"
+		JWTConfig.HTTPS = true
+		JWTConfig.SameSite = http.SameSiteNoneMode
+
+	case "production":
+		MongoConfig.Connector = "mongodb+srv"
+		JWTConfig.Domain = "tanjungbunga.id"
+		JWTConfig.Path = "/"
+		JWTConfig.HTTPS = true
+		JWTConfig.SameSite = http.SameSiteNoneMode
+
 	default:
-		log.Fatal(errors.New("Invalid MODE, must be: local, staging, production"))
+		log.Fatal(errors.New("Invalid MODE, must be: development, staging-local, staging, production"))
 	}
 }
