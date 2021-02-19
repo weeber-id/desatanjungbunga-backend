@@ -74,14 +74,14 @@ func InitializationVariable() {
 
 	case "staging-local":
 		MongoConfig.Connector = "mongodb+srv"
-		JWTConfig.Domain = "localhost"
+		JWTConfig.Domain = "weeber.id" // for https://web-localhost.weeber.id:3000
 		JWTConfig.Path = "/"
 		JWTConfig.HTTPS = true
 		JWTConfig.SameSite = http.SameSiteNoneMode
 
 	case "staging":
 		MongoConfig.Connector = "mongodb+srv"
-		JWTConfig.Domain = "staging-tanjungbunga.weeber.id"
+		JWTConfig.Domain = "staging-tanjungbunga.weeber.id" // for https://staging-tanjungbunga.weeber.id
 		JWTConfig.Path = "/"
 		JWTConfig.HTTPS = true
 		JWTConfig.SameSite = http.SameSiteNoneMode

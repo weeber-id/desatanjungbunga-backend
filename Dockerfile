@@ -12,5 +12,6 @@ RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
 WORKDIR /app
 COPY --from=build-go-deps /work/main.out /app
+COPY --from=build-go-deps /work/VERSION /app
 EXPOSE 8080
 CMD ["./main.out"]

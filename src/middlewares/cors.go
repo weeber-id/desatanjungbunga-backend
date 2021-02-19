@@ -11,6 +11,8 @@ func CORS() gin.HandlerFunc {
 		switch origin {
 		case
 			"http://localhost:3000",
+			"https://localhost:3000",
+			"https://web-localhost.weeber.id:3000",
 			"https://staging-tanjungbunga.weeber.id",
 			"https://tanjungbunga.id",
 			"https://www.tanjungbunga.id",

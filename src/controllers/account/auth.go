@@ -34,9 +34,13 @@ func AdminLogin(c *gin.Context) {
 
 	middlewares.WriteAccessToken2Cookie(c, admin.ID.Hex(), admin.Role)
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "login success",
-		"data":    admin,
+	c.JSON(http.StatusOK, models.Response{
+		Meta: models.Meta{
+			Message: "Login Success",
+			Status:  "OK",
+			Code:    200,
+		},
+		Data: admin,
 	})
 }
 

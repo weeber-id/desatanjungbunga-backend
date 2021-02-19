@@ -39,6 +39,7 @@ func main() {
 	)
 
 	router := gin.Default()
+	router.Use(middlewares.CORS())
 	root := router.Group("/api")
 	{
 		root.GET("/", controllers.HealthCheck)
