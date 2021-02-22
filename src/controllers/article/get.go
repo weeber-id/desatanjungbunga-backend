@@ -9,16 +9,17 @@ import (
 
 // GetOne article controller
 func GetOne(c *gin.Context) {
-	var request struct {
-		ID   *string `form:"id"`
-		Slug *string `form:"slug"`
-	}
+	var (
+		request struct {
+			ID   *string `form:"id"`
+			Slug *string `form:"slug"`
+		}
+		response models.Response
+	)
 
 	c.BindQuery(&request)
 	if request.ID == nil && request.Slug == nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{
-			"error": "id or slug must be filled",
-		})
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest("id atau slug harus diisi"))
 		return
 	}
 
@@ -33,24 +34,24 @@ func GetOne(c *gin.Context) {
 	}
 
 	if !found {
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "data not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, response.ErrorDataNotFound())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-		"data":    article,
-	})
+	c.JSON(http.StatusOK, response.SuccessData(article))
 }
 
 // GetMultiple controller
 func GetMultiple(c *gin.Context) {
-	var request struct {
-		SortTitle      *string `form:"sort_title"`
-		SortDate       *string `form:"sort_date"`
-		Page           *int64  `form:"page"`
-		ContentPerPage *int64  `form:"content_per_page"`
-	}
+	var (
+		request struct {
+			SortTitle      *string `form:"sort_title"`
+			SortDate       *string `form:"sort_date"`
+			Page           *int64  `form:"page"`
+			ContentPerPage *int64  `form:"content_per_page"`
+		}
+		response models.Response
+	)
 
 	c.BindQuery(&request)
 
@@ -67,12 +68,9 @@ func GetMultiple(c *gin.Context) {
 	}
 
 	if err := articles.Get(c); err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-		"data":    articles.Data(),
-	})
+	c.JSON(http.StatusOK, response.SuccessDataList(articles.Data()))
 }

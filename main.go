@@ -48,6 +48,20 @@ func main() {
 		root.POST("/login", account.AdminLogin)
 		root.POST("/logout", account.AdminLogut)
 
+		root.GET("/article", article.GetOne)
+		root.GET("/articles", article.GetMultiple)
+
+		root.GET("/travel", wisata.GetOne)
+		root.GET("/travels", wisata.GetMultiple)
+
+		root.GET("/shopping", belanja.GetOne)
+		root.GET("/shoppings", belanja.GetMultiple)
+
+		root.GET("/culinary", kuliner.GetOne)
+		root.GET("/culinaries", kuliner.GetMultiple)
+
+		root.GET("/discussion", discussion.GetMultiple)
+
 		admin := root.Group("/admin")
 		admin.Use(middlewares.AdminAuthorization())
 		{
