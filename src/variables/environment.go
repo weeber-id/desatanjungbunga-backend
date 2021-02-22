@@ -27,6 +27,14 @@ var MongoConfig struct {
 	Password string
 }
 
+// MinioConfig data type
+var MinioConfig struct {
+	URIEndpoint string
+	Endpoint    string
+	AccessKey   string
+	SecretKey   string
+}
+
 // JWTConfig datatype
 var JWTConfig struct {
 	Key string
@@ -58,6 +66,11 @@ func InitializationVariable() {
 	MongoConfig.User = os.Getenv("MONGO_USER")
 	MongoConfig.Password = os.Getenv("MONGO_PASS")
 	MongoConfig.Database = os.Getenv("MONGO_DATABASE")
+
+	MinioConfig.URIEndpoint = os.Getenv("MINIO_URIENDPOINT")
+	MinioConfig.Endpoint = os.Getenv("MINIO_ENDPOINT")
+	MinioConfig.AccessKey = os.Getenv("MINIO_ACCESS_KEY")
+	MinioConfig.SecretKey = os.Getenv("MINIO_SECRET_KEY")
 
 	JWTConfig.Key = os.Getenv("JWT_SECRET_KEY")
 	JWTConfig.TokenName = "auth_token"

@@ -14,6 +14,7 @@ import (
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/belanja"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/discussion"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/kuliner"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/media"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/wisata"
 	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
 	"github.com/weeber-id/desatanjungbunga-backend/src/services"
@@ -28,9 +29,10 @@ func main() {
 	// MongoDB section
 	ctx, cancel := context.WithTimeout(context.Background(), 3*time.Second)
 	defer cancel()
-
 	client := services.InitializationMongo(ctx)
 	defer client.Disconnect(ctx)
+
+	services.InitializationMinio()
 
 	port := 8080
 	log.Printf(
@@ -50,6 +52,8 @@ func main() {
 		admin.Use(middlewares.AdminAuthorization())
 		{
 			admin.POST("/register", account.AdminCreate)
+
+			admin.POST("/media/upload/public", media.UploadPublicFile)
 
 			admin.GET("/article", article.GetOne)
 			admin.GET("/articles", article.GetMultiple)
