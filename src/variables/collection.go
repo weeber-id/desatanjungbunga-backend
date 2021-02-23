@@ -6,13 +6,13 @@ var Collection = struct {
 	Discussion string
 	Article    string
 	Travel     string
-	Kuliner    string
-	Belanja    string
+	Culinary   string
+	Handcraft  string
 }{
 	Admin:      "admin",
 	Discussion: "discussion",
 	Article:    "article",
 	Travel:     "travel",
-	Kuliner:    "kuliner",
-	Belanja:    "belanja",
+	Culinary:   "culinary",
+	Handcraft:  "Handcraft",
 }

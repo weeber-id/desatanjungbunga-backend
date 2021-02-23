@@ -23,7 +23,7 @@ type Belanja struct {
 
 // Collection pointer to this model
 func (Belanja) Collection() *mongo.Collection {
-	return services.DB.Collection(variables.Collection.Belanja)
+	return services.DB.Collection(variables.Collection.Handcraft)
 }
 
 // Create new belanja to database
@@ -72,7 +72,7 @@ type MultipleBelanja struct {
 
 // Collection belanja mongo
 func (MultipleBelanja) Collection() *mongo.Collection {
-	return services.DB.Collection(variables.Collection.Belanja)
+	return services.DB.Collection(variables.Collection.Handcraft)
 }
 
 // Get multiple belanja from database

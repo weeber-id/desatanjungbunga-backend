@@ -9,26 +9,29 @@ import (
 
 // Delete controller
 func Delete(c *gin.Context) {
-	var requestQuery struct {
-		ID string `form:"id" binding:"required"`
-	}
+	var (
+		requestQuery struct {
+			ID string `form:"id" binding:"required"`
+		}
+		response models.Response
+	)
 
 	if err := c.BindQuery(&requestQuery); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest(err.Error()))
 		return
 	}
 
-	kuliner := new(models.Kuliner)
+	kuliner := new(models.Culinary)
 	found, _ := kuliner.GetByID(c, requestQuery.ID)
 	if !found {
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "data not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, response.ErrorDataNotFound())
 		return
 	}
 
 	if err := kuliner.Delete(c); err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "kuliner deleted"})
+	c.JSON(http.StatusOK, response.SuccessData(nil))
 }

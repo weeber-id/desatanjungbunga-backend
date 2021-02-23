@@ -9,16 +9,19 @@ import (
 
 // GetOne kuliner controller
 func GetOne(c *gin.Context) {
-	var request struct {
-		ID *string `form:"id" binding:"required"`
-	}
+	var (
+		request struct {
+			ID *string `form:"id" binding:"required"`
+		}
+		response models.Response
+	)
 
 	if err := c.BindQuery(&request); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest(err.Error()))
 		return
 	}
 
-	kuliner := new(models.Kuliner)
+	kuliner := new(models.Culinary)
 
 	var found bool
 	if request.ID != nil {
@@ -26,27 +29,23 @@ func GetOne(c *gin.Context) {
 	}
 
 	if !found {
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "data not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, response.ErrorDataNotFound())
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-		"data":    kuliner,
-	})
+	c.JSON(http.StatusOK, response.SuccessData(kuliner))
 }
 
 // GetMultiple controller
 func GetMultiple(c *gin.Context) {
+	var response models.Response
+
 	multiKuliner := new(models.MultipleKuliner)
 
 	if err := multiKuliner.Get(c); err != nil {
-		c.AbortWithError(http.StatusInternalServerError, err)
+		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-		"data":    multiKuliner.Data(),
-	})
+	c.JSON(http.StatusOK, response.SuccessDataList(multiKuliner.Data()))
 }

@@ -12,22 +12,41 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Kuliner collection model
-type Kuliner struct {
+// Culinary collection model
+type Culinary struct {
 	BaseContent `bson:",inline"`
 
-	Title       string
-	ImageCover  string `bson:"image_cover" json:"image_cover"`
-	Description string `bson:"description" json:"description"`
+	Name  string `bson:"name" json:"name"`
+	Price struct {
+		Start string `bson:"start" json:"start"`
+		End   string `bson:"end" json:"end"`
+		Unit  string `bson:"unit" json:"unit"`
+	} `bson:"price" json:"price"`
+	OperationTime struct {
+		From struct {
+			Day  string `bson:"day" json:"day"`
+			Time string `bson:"time" json:"time"`
+		} `bson:"from" json:"from"`
+		To struct {
+			Day  string `bson:"day" json:"day"`
+			Time string `bson:"time" json:"time"`
+		} `bson:"to" json:"to"`
+	} `bson:"operation_time" json:"operation_time"`
+	Links []struct {
+		Name string `bson:"name" json:"name"`
+		Link string `bson:"link" json:"link"`
+	} `bson:"links" json:"links"`
+	ShortDescription string `bson:"short_description" json:"short_description"`
+	Description      string `bson:"description" json:"description"`
 }
 
 // Collection pointer to this model
-func (Kuliner) Collection() *mongo.Collection {
-	return services.DB.Collection(variables.Collection.Kuliner)
+func (Culinary) Collection() *mongo.Collection {
+	return services.DB.Collection(variables.Collection.Culinary)
 }
 
 // Create new kuliner to database
-func (k *Kuliner) Create(ctx context.Context) error {
+func (k *Culinary) Create(ctx context.Context) error {
 	k.CreatedAt = time.Now()
 	k.UpdatedAt = time.Now()
 
@@ -41,7 +60,7 @@ func (k *Kuliner) Create(ctx context.Context) error {
 }
 
 // GetByID read from database
-func (k *Kuliner) GetByID(ctx context.Context, id string) (found bool, err error) {
+func (k *Culinary) GetByID(ctx context.Context, id string) (found bool, err error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return false, err
@@ -52,7 +71,7 @@ func (k *Kuliner) GetByID(ctx context.Context, id string) (found bool, err error
 }
 
 // Update kuliner to database
-func (k *Kuliner) Update(ctx context.Context) error {
+func (k *Culinary) Update(ctx context.Context) error {
 	k.UpdatedAt = time.Now()
 
 	update := bson.M{"$set": *k}
@@ -61,18 +80,18 @@ func (k *Kuliner) Update(ctx context.Context) error {
 }
 
 // Delete kuliner from database
-func (k *Kuliner) Delete(ctx context.Context) error {
+func (k *Culinary) Delete(ctx context.Context) error {
 	return k.Collection().FindOneAndDelete(ctx, bson.M{"_id": k.ID}).Err()
 }
 
 // MultipleKuliner multiple model
 type MultipleKuliner struct {
-	data []Kuliner
+	data []Culinary
 }
 
 // Collection kuliner mongo
 func (MultipleKuliner) Collection() *mongo.Collection {
-	return services.DB.Collection(variables.Collection.Kuliner)
+	return services.DB.Collection(variables.Collection.Culinary)
 }
 
 // Get multiple kuliner from database
@@ -88,7 +107,7 @@ func (k *MultipleKuliner) Get(ctx context.Context) error {
 	}
 
 	for cur.Next(ctx) {
-		var kuliner Kuliner
+		var kuliner Culinary
 
 		cur.Decode(&kuliner)
 		k.data = append(k.data, kuliner)
@@ -98,6 +117,6 @@ func (k *MultipleKuliner) Get(ctx context.Context) error {
 }
 
 // Data kuliner
-func (k *MultipleKuliner) Data() []Kuliner {
+func (k *MultipleKuliner) Data() []Culinary {
 	return k.data
 }
