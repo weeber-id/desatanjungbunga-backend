@@ -15,7 +15,7 @@ import (
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/discussion"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/kuliner"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/media"
-	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/wisata"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/travel"
 	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
 	"github.com/weeber-id/desatanjungbunga-backend/src/services"
 	"github.com/weeber-id/desatanjungbunga-backend/src/variables"
@@ -51,8 +51,8 @@ func main() {
 		root.GET("/article", article.GetOne)
 		root.GET("/articles", article.GetMultiple)
 
-		root.GET("/travel", wisata.GetOne)
-		root.GET("/travels", wisata.GetMultiple)
+		root.GET("/travel", travel.GetOne)
+		root.GET("/travels", travel.GetMultiple)
 
 		root.GET("/shopping", belanja.GetOne)
 		root.GET("/shoppings", belanja.GetMultiple)
@@ -75,11 +75,11 @@ func main() {
 			admin.POST("/article/update", article.Update)
 			admin.POST("/article/delete", article.Delete)
 
-			admin.GET("/travel", wisata.GetOne)
-			admin.GET("/travels", wisata.GetMultiple)
-			admin.POST("/travel/create", wisata.Create)
-			admin.POST("/travel/update", wisata.Update)
-			admin.POST("/travel/delete", wisata.Delete)
+			admin.GET("/travel", travel.GetOne)
+			admin.GET("/travels", travel.GetMultiple)
+			admin.POST("/travel/create", travel.Create)
+			admin.POST("/travel/update", travel.Update)
+			admin.POST("/travel/delete", travel.Delete)
 
 			admin.GET("/shopping", belanja.GetOne)
 			admin.GET("/shoppings", belanja.GetMultiple)

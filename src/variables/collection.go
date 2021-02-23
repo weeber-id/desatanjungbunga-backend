@@ -5,14 +5,14 @@ var Collection = struct {
 	Admin      string
 	Discussion string
 	Article    string
-	Wisata     string
+	Travel     string
 	Kuliner    string
 	Belanja    string
 }{
 	Admin:      "admin",
 	Discussion: "discussion",
 	Article:    "article",
-	Wisata:     "wisata",
+	Travel:     "travel",
 	Kuliner:    "kuliner",
 	Belanja:    "belanja",
 }

@@ -19,7 +19,7 @@ type Response struct {
 func (r *Response) ErrorBadRequest(message string) *Response {
 	r.Meta.Message = message
 	r.Meta.Status = "bad request"
-	r.Meta.Code = http.StatusBadGateway
+	r.Meta.Code = http.StatusBadRequest
 
 	r.Data = nil
 	return r

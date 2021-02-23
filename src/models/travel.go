@@ -12,23 +12,33 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Wisata collection model
-type Wisata struct {
-	BaseContent `bson:",inline"`
-
-	Title       string
-	ImageCover  string `bson:"image_cover" json:"image_cover"`
-	Author      string `bson:"author" json:"author"`
-	Description string `bson:"description" json:"description"`
+// Travel collection model
+type Travel struct {
+	BaseContent   `bson:",inline"`
+	Name          string `bson:"name" json:"name"`
+	Image         string `bson:"image" json:"image"`
+	Price         string `bson:"price" json:"price"`
+	OperationTime struct {
+		From struct {
+			Day  string `bson:"day" json:"day"`
+			Time string `bson:"time" json:"time"`
+		} `bson:"from" json:"from"`
+		To struct {
+			Day  string `bson:"day" json:"day"`
+			Time string `bson:"time" json:"time"`
+		} `bson:"to" json:"to"`
+	} `bson:"operation_time" json:"operation_time"`
+	ShortDescription string `bson:"short_description" json:"short_description"`
+	Description      string `bson:"description" json:"description"`
 }
 
 // Collection pointer to this model
-func (Wisata) Collection() *mongo.Collection {
-	return services.DB.Collection(variables.Collection.Wisata)
+func (Travel) Collection() *mongo.Collection {
+	return services.DB.Collection(variables.Collection.Travel)
 }
 
 // Create new wisata to database
-func (w *Wisata) Create(ctx context.Context) error {
+func (w *Travel) Create(ctx context.Context) error {
 	w.CreatedAt = time.Now()
 	w.UpdatedAt = time.Now()
 
@@ -42,7 +52,7 @@ func (w *Wisata) Create(ctx context.Context) error {
 }
 
 // GetByID read from database
-func (w *Wisata) GetByID(ctx context.Context, id string) (found bool, err error) {
+func (w *Travel) GetByID(ctx context.Context, id string) (found bool, err error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return false, err
@@ -53,7 +63,7 @@ func (w *Wisata) GetByID(ctx context.Context, id string) (found bool, err error)
 }
 
 // Update wisata to database
-func (w *Wisata) Update(ctx context.Context) error {
+func (w *Travel) Update(ctx context.Context) error {
 	w.UpdatedAt = time.Now()
 
 	update := bson.M{"$set": *w}
@@ -62,18 +72,18 @@ func (w *Wisata) Update(ctx context.Context) error {
 }
 
 // Delete wisata from database
-func (w *Wisata) Delete(ctx context.Context) error {
+func (w *Travel) Delete(ctx context.Context) error {
 	return w.Collection().FindOneAndDelete(ctx, bson.M{"_id": w.ID}).Err()
 }
 
 // MultipleWisata multiple model
 type MultipleWisata struct {
-	data []Wisata
+	data []Travel
 }
 
 // Collection wisata mongo
 func (MultipleWisata) Collection() *mongo.Collection {
-	return services.DB.Collection(variables.Collection.Wisata)
+	return services.DB.Collection(variables.Collection.Travel)
 }
 
 // Get multiple wisata from database
@@ -89,7 +99,7 @@ func (w *MultipleWisata) Get(ctx context.Context) error {
 	}
 
 	for cur.Next(ctx) {
-		var wis Wisata
+		var wis Travel
 
 		cur.Decode(&wis)
 		w.data = append(w.data, wis)
@@ -99,6 +109,6 @@ func (w *MultipleWisata) Get(ctx context.Context) error {
 }
 
 // Data wisata
-func (w *MultipleWisata) Data() []Wisata {
+func (w *MultipleWisata) Data() []Travel {
 	return w.data
 }
