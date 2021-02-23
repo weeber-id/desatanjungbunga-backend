@@ -24,8 +24,8 @@ type Handcraft struct {
 			Time string `bson:"time" json:"time"`
 		} `bson:"from" json:"from"`
 		To struct {
-			Day  string `bson:"" json:"day"`
-			Time string `bson:"" json:"time"`
+			Day  string `bson:"day" json:"day"`
+			Time string `bson:"time" json:"time"`
 		} `bson:"to" json:"to"`
 	} `bson:"operation_time" json:"operation_time"`
 	Links []struct {

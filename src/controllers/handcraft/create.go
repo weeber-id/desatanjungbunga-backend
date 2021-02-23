@@ -48,8 +48,8 @@ func Create(c *gin.Context) {
 				Time string "bson:\"time\" json:\"time\""
 			} "bson:\"from\" json:\"from\""
 			To struct {
-				Day  string "bson:\"\" json:\"day\""
-				Time string "bson:\"\" json:\"time\""
+				Day  string "bson:\"day\" json:\"day\""
+				Time string "bson:\"time\" json:\"time\""
 			} "bson:\"to\" json:\"to\""
 		}(request.OperationTime),
 

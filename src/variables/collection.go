@@ -8,6 +8,9 @@ var Collection = struct {
 	Travel     string
 	Culinary   string
 	Handcraft  string
+
+	Lodging           string
+	LodgindFacilities string
 }{
 	Admin:      "admin",
 	Discussion: "discussion",
@@ -15,4 +18,7 @@ var Collection = struct {
 	Travel:     "travel",
 	Culinary:   "culinary",
 	Handcraft:  "handcraft",
+
+	Lodging:           "lodging",
+	LodgindFacilities: "lodging_facilities",
 }

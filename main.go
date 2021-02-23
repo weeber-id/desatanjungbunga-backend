@@ -14,6 +14,7 @@ import (
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/discussion"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/handcraft"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/kuliner"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/lodging"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/media"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/travel"
 	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
@@ -60,6 +61,9 @@ func main() {
 		root.GET("/culinary", kuliner.GetOne)
 		root.GET("/culinaries", kuliner.GetMultiple)
 
+		root.GET("/lodging", lodging.GetOne)
+		root.GET("/lodgings", lodging.GetMultiple)
+
 		root.GET("/discussion", discussion.GetMultiple)
 
 		admin := root.Group("/admin")
@@ -92,6 +96,12 @@ func main() {
 			admin.POST("/culinary/create", kuliner.Create)
 			admin.POST("/culinary/update", kuliner.Update)
 			admin.POST("/culinary/delete", kuliner.Delete)
+
+			admin.GET("/lodging", lodging.GetOne)
+			admin.GET("/lodgings", lodging.GetMultiple)
+			admin.POST("/lodging/create", lodging.Create)
+			admin.POST("/lodging/update", lodging.Update)
+			admin.POST("/lodging/delete", lodging.Delete)
 
 			admin.GET("/discussion", discussion.GetMultiple)
 			admin.POST("/discussion/create", discussion.Create)
