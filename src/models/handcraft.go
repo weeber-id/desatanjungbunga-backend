@@ -12,22 +12,37 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
-// Belanja collection model
-type Belanja struct {
+// Handcraft collection model
+type Handcraft struct {
 	BaseContent `bson:",inline"`
 
-	Title       string
-	ImageCover  string `bson:"image_cover" json:"image_cover"`
-	Description string `bson:"description" json:"description"`
+	Name          string `bson:"name" json:"name"`
+	Price         string `bson:"price" json:"price"`
+	OperationTime struct {
+		From struct {
+			Day  string `bson:"day" json:"day"`
+			Time string `bson:"time" json:"time"`
+		} `bson:"from" json:"from"`
+		To struct {
+			Day  string `bson:"" json:"day"`
+			Time string `bson:"" json:"time"`
+		} `bson:"to" json:"to"`
+	} `bson:"operation_time" json:"operation_time"`
+	Links []struct {
+		Name string `bson:"name" json:"name"`
+		Link string `bson:"link" json:"link"`
+	} `bson:"links" json:"links"`
+	ShortDescription string `bson:"short_description" json:"short_description"`
+	Description      string `bson:"description" json:"description"`
 }
 
 // Collection pointer to this model
-func (Belanja) Collection() *mongo.Collection {
+func (Handcraft) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Handcraft)
 }
 
 // Create new belanja to database
-func (b *Belanja) Create(ctx context.Context) error {
+func (b *Handcraft) Create(ctx context.Context) error {
 	b.CreatedAt = time.Now()
 	b.UpdatedAt = time.Now()
 
@@ -41,7 +56,7 @@ func (b *Belanja) Create(ctx context.Context) error {
 }
 
 // GetByID read from database
-func (b *Belanja) GetByID(ctx context.Context, id string) (found bool, err error) {
+func (b *Handcraft) GetByID(ctx context.Context, id string) (found bool, err error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
 	if err != nil {
 		return false, err
@@ -52,7 +67,7 @@ func (b *Belanja) GetByID(ctx context.Context, id string) (found bool, err error
 }
 
 // Update belanja to database
-func (b *Belanja) Update(ctx context.Context) error {
+func (b *Handcraft) Update(ctx context.Context) error {
 	b.UpdatedAt = time.Now()
 
 	update := bson.M{"$set": *b}
@@ -61,13 +76,13 @@ func (b *Belanja) Update(ctx context.Context) error {
 }
 
 // Delete belanja from database
-func (b *Belanja) Delete(ctx context.Context) error {
+func (b *Handcraft) Delete(ctx context.Context) error {
 	return b.Collection().FindOneAndDelete(ctx, bson.M{"_id": b.ID}).Err()
 }
 
 // MultipleBelanja multiple model
 type MultipleBelanja struct {
-	data []Belanja
+	data []Handcraft
 }
 
 // Collection belanja mongo
@@ -88,7 +103,7 @@ func (b *MultipleBelanja) Get(ctx context.Context) error {
 	}
 
 	for cur.Next(ctx) {
-		var belanja Belanja
+		var belanja Handcraft
 
 		cur.Decode(&belanja)
 		b.data = append(b.data, belanja)
@@ -98,6 +113,6 @@ func (b *MultipleBelanja) Get(ctx context.Context) error {
 }
 
 // Data belanja
-func (b *MultipleBelanja) Data() []Belanja {
+func (b *MultipleBelanja) Data() []Handcraft {
 	return b.data
 }

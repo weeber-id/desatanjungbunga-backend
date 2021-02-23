@@ -14,5 +14,5 @@ var Collection = struct {
 	Article:    "article",
 	Travel:     "travel",
 	Culinary:   "culinary",
-	Handcraft:  "Handcraft",
+	Handcraft:  "handcraft",
 }

@@ -11,8 +11,8 @@ import (
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/account"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/article"
-	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/belanja"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/discussion"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/handcraft"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/kuliner"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/media"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/travel"
@@ -54,8 +54,8 @@ func main() {
 		root.GET("/travel", travel.GetOne)
 		root.GET("/travels", travel.GetMultiple)
 
-		root.GET("/shopping", belanja.GetOne)
-		root.GET("/shoppings", belanja.GetMultiple)
+		root.GET("/handcraft", handcraft.GetOne)
+		root.GET("/handcrafts", handcraft.GetMultiple)
 
 		root.GET("/culinary", kuliner.GetOne)
 		root.GET("/culinaries", kuliner.GetMultiple)
@@ -81,11 +81,11 @@ func main() {
 			admin.POST("/travel/update", travel.Update)
 			admin.POST("/travel/delete", travel.Delete)
 
-			admin.GET("/shopping", belanja.GetOne)
-			admin.GET("/shoppings", belanja.GetMultiple)
-			admin.POST("/shopping/create", belanja.Create)
-			admin.POST("/shopping/update", belanja.Update)
-			admin.POST("/shopping/delete", belanja.Delete)
+			admin.GET("/handcraft", handcraft.GetOne)
+			admin.GET("/handcrafts", handcraft.GetMultiple)
+			admin.POST("/handcraft/create", handcraft.Create)
+			admin.POST("/handcraft/update", handcraft.Update)
+			admin.POST("/handcraft/delete", handcraft.Delete)
 
 			admin.GET("/culinary", kuliner.GetOne)
 			admin.GET("/culinaries", kuliner.GetMultiple)
