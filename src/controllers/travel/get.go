@@ -43,9 +43,29 @@ func GetOne(c *gin.Context) {
 
 // GetMultiple controller
 func GetMultiple(c *gin.Context) {
-	var response models.Response
+	var (
+		request struct {
+			SortName       *string `form:"sort_title"`
+			SortDate       *string `form:"sort_date"`
+			Page           *int    `form:"page"`
+			ContentPerPage *int    `form:"content_per_page"`
+		}
+		response models.Response
+	)
+
+	c.BindQuery(&request)
 
 	multiTravel := new(models.MultipleWisata)
+
+	if request.SortName != nil {
+		multiTravel.SortByName(*request.SortName)
+	}
+	if request.SortDate != nil {
+		multiTravel.SortByDate(*request.SortDate)
+	}
+	if request.Page != nil && request.ContentPerPage != nil {
+		multiTravel.FilterByPaginate(*request.Page, *request.ContentPerPage)
+	}
 
 	if err := multiTravel.Get(c); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))

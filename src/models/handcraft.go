@@ -11,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Handcraft collection model
@@ -97,6 +96,8 @@ func (b *Handcraft) Delete(ctx context.Context) error {
 
 // MultipleBelanja multiple model
 type MultipleBelanja struct {
+	baseList
+
 	data []Handcraft
 }
 
@@ -105,14 +106,17 @@ func (MultipleBelanja) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Handcraft)
 }
 
+// SortByName asc or desc
+func (b *MultipleBelanja) SortByName(direction string) {
+	numDirection := b.getDirectionFromStringToInt(direction)
+	b.aggregate = append(b.aggregate, bson.M{
+		"$sort": bson.M{"name": numDirection},
+	})
+}
+
 // Get multiple belanja from database
 func (b *MultipleBelanja) Get(ctx context.Context) error {
-	filter := bson.D{}
-
-	opt := options.Find()
-	opt.SetSort(bson.M{"_id": -1})
-
-	cur, err := b.Collection().Find(ctx, filter, opt)
+	cur, err := b.Collection().Aggregate(ctx, b.aggregate)
 	if err != nil {
 		return err
 	}

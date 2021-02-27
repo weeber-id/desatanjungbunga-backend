@@ -11,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Travel collection model
@@ -93,6 +92,8 @@ func (w *Travel) Delete(ctx context.Context) error {
 
 // MultipleWisata multiple model
 type MultipleWisata struct {
+	baseList
+
 	data []Travel
 }
 
@@ -101,14 +102,17 @@ func (MultipleWisata) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Travel)
 }
 
+// SortByName asc or desc
+func (w *MultipleWisata) SortByName(direction string) {
+	numDirection := w.getDirectionFromStringToInt(direction)
+	w.aggregate = append(w.aggregate, bson.M{
+		"$sort": bson.M{"name": numDirection},
+	})
+}
+
 // Get multiple wisata from database
 func (w *MultipleWisata) Get(ctx context.Context) error {
-	filter := bson.D{}
-
-	opt := options.Find()
-	opt.SetSort(bson.M{"_id": -1})
-
-	cur, err := w.Collection().Find(ctx, filter, opt)
+	cur, err := w.Collection().Aggregate(ctx, w.aggregate)
 	if err != nil {
 		return err
 	}

@@ -11,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Culinary collection model
@@ -102,6 +101,8 @@ func (k *Culinary) Delete(ctx context.Context) error {
 
 // MultipleKuliner multiple model
 type MultipleKuliner struct {
+	baseList
+
 	data []Culinary
 }
 
@@ -110,14 +111,17 @@ func (MultipleKuliner) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Culinary)
 }
 
+// SortByName asc or desc
+func (k *MultipleKuliner) SortByName(direction string) {
+	numDirection := k.getDirectionFromStringToInt(direction)
+	k.aggregate = append(k.aggregate, bson.M{
+		"$sort": bson.M{"name": numDirection},
+	})
+}
+
 // Get multiple kuliner from database
 func (k *MultipleKuliner) Get(ctx context.Context) error {
-	filter := bson.D{}
-
-	opt := options.Find()
-	opt.SetSort(bson.M{"_id": -1})
-
-	cur, err := k.Collection().Find(ctx, filter, opt)
+	cur, err := k.Collection().Aggregate(ctx, k.aggregate)
 	if err != nil {
 		return err
 	}

@@ -43,9 +43,27 @@ func GetOne(c *gin.Context) {
 
 // GetMultiple lodging controller
 func GetMultiple(c *gin.Context) {
-	var response models.Response
+	var (
+		request struct {
+			SortName       *string `form:"sort_title"`
+			SortDate       *string `form:"sort_date"`
+			Page           *int    `form:"page"`
+			ContentPerPage *int    `form:"content_per_page"`
+		}
+		response models.Response
+	)
 
 	lodgings := new(models.MultipleLodging)
+
+	if request.SortName != nil {
+		lodgings.SortByName(*request.SortName)
+	}
+	if request.SortDate != nil {
+		lodgings.SortByDate(*request.SortDate)
+	}
+	if request.Page != nil && request.ContentPerPage != nil {
+		lodgings.FilterByPaginate(*request.Page, *request.ContentPerPage)
+	}
 
 	if err := lodgings.Get(c); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))

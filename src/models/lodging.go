@@ -95,6 +95,8 @@ func (l *Lodging) Delete(ctx context.Context) error {
 
 // MultipleLodging collection structure
 type MultipleLodging struct {
+	baseList
+
 	data []Lodging
 }
 
@@ -103,14 +105,17 @@ func (MultipleLodging) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Lodging)
 }
 
+// SortByName asc or desc
+func (m *MultipleLodging) SortByName(direction string) {
+	numDirection := m.getDirectionFromStringToInt(direction)
+	m.aggregate = append(m.aggregate, bson.M{
+		"$sort": bson.M{"name": numDirection},
+	})
+}
+
 // Get multiple lodging from database
 func (m *MultipleLodging) Get(ctx context.Context) error {
-	filter := bson.D{}
-
-	opt := options.Find()
-	opt.SetSort(bson.M{"_id": -1})
-
-	cur, err := m.Collection().Find(ctx, filter, opt)
+	cur, err := m.Collection().Aggregate(ctx, m.aggregate)
 	if err != nil {
 		return err
 	}
