@@ -2,9 +2,11 @@ package models
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/weeber-id/desatanjungbunga-backend/src/services"
+	"github.com/weeber-id/desatanjungbunga-backend/src/tools"
 	"github.com/weeber-id/desatanjungbunga-backend/src/variables"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -17,6 +19,8 @@ type Culinary struct {
 	BaseContent `bson:",inline"`
 
 	Name  string `bson:"name" json:"name"`
+	Image string `bson:"image" json:"image"`
+	Slug  string `bsonn:"slug" json:"slug"`
 	Price struct {
 		Start string `bson:"start" json:"start"`
 		End   string `bson:"end" json:"end"`
@@ -50,6 +54,12 @@ func (k *Culinary) Create(ctx context.Context) error {
 	k.CreatedAt = time.Now()
 	k.UpdatedAt = time.Now()
 
+	slug, err := tools.GenerateSlug(k.Name)
+	if err != nil {
+		log.Fatalf("error create slug culinary: %v", err)
+	}
+	k.Slug = slug
+
 	result, err := k.Collection().InsertOne(ctx, *k)
 	if err != nil {
 		return err
@@ -67,6 +77,12 @@ func (k *Culinary) GetByID(ctx context.Context, id string) (found bool, err erro
 	}
 
 	err = k.Collection().FindOne(ctx, bson.M{"_id": objectID}).Decode(k)
+	return k.IsFoundFromError(err), err
+}
+
+// GetBySlug read from database
+func (k *Culinary) GetBySlug(ctx context.Context, slug string) (found bool, err error) {
+	err = k.Collection().FindOne(ctx, bson.M{"slug": slug}).Decode(k)
 	return k.IsFoundFromError(err), err
 }
 

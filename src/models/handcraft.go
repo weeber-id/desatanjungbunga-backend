@@ -2,9 +2,11 @@ package models
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/weeber-id/desatanjungbunga-backend/src/services"
+	"github.com/weeber-id/desatanjungbunga-backend/src/tools"
 	"github.com/weeber-id/desatanjungbunga-backend/src/variables"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,6 +20,7 @@ type Handcraft struct {
 
 	Name          string `bson:"name" json:"name"`
 	Price         string `bson:"price" json:"price"`
+	Slug          string `bson:"slug" json:"slug"`
 	OperationTime struct {
 		From struct {
 			Day  string `bson:"day" json:"day"`
@@ -46,6 +49,12 @@ func (b *Handcraft) Create(ctx context.Context) error {
 	b.CreatedAt = time.Now()
 	b.UpdatedAt = time.Now()
 
+	slug, err := tools.GenerateSlug(b.Name)
+	if err != nil {
+		log.Fatalf("error create slug article: %v", err)
+	}
+	b.Slug = slug
+
 	result, err := b.Collection().InsertOne(ctx, *b)
 	if err != nil {
 		return err
@@ -63,6 +72,12 @@ func (b *Handcraft) GetByID(ctx context.Context, id string) (found bool, err err
 	}
 
 	err = b.Collection().FindOne(ctx, bson.M{"_id": objectID}).Decode(b)
+	return b.IsFoundFromError(err), err
+}
+
+// GetBySlug read from database
+func (b *Handcraft) GetBySlug(ctx context.Context, slug string) (found bool, err error) {
+	err = b.Collection().FindOne(ctx, bson.M{"slug": slug}).Decode(b)
 	return b.IsFoundFromError(err), err
 }
 

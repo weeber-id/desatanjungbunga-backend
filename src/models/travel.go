@@ -2,9 +2,11 @@ package models
 
 import (
 	"context"
+	"log"
 	"time"
 
 	"github.com/weeber-id/desatanjungbunga-backend/src/services"
+	"github.com/weeber-id/desatanjungbunga-backend/src/tools"
 	"github.com/weeber-id/desatanjungbunga-backend/src/variables"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -18,6 +20,7 @@ type Travel struct {
 	Name          string `bson:"name" json:"name"`
 	Image         string `bson:"image" json:"image"`
 	Price         string `bson:"price" json:"price"`
+	Slug          string `bson:"slug" json:"slug"`
 	OperationTime struct {
 		From struct {
 			Day  string `bson:"day" json:"day"`
@@ -42,6 +45,12 @@ func (w *Travel) Create(ctx context.Context) error {
 	w.CreatedAt = time.Now()
 	w.UpdatedAt = time.Now()
 
+	slug, err := tools.GenerateSlug(w.Name)
+	if err != nil {
+		log.Fatalf("error create slug article: %v", err)
+	}
+	w.Slug = slug
+
 	result, err := w.Collection().InsertOne(ctx, *w)
 	if err != nil {
 		return err
@@ -59,6 +68,12 @@ func (w *Travel) GetByID(ctx context.Context, id string) (found bool, err error)
 	}
 
 	err = w.Collection().FindOne(ctx, bson.M{"_id": objectID}).Decode(w)
+	return w.IsFoundFromError(err), err
+}
+
+// GetBySlug read from database
+func (w *Travel) GetBySlug(ctx context.Context, slug string) (found bool, err error) {
+	err = w.Collection().FindOne(ctx, bson.M{"slug": slug}).Decode(w)
 	return w.IsFoundFromError(err), err
 }
 

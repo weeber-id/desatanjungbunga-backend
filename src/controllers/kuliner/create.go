@@ -12,6 +12,7 @@ func Create(c *gin.Context) {
 	var (
 		request struct {
 			Name  string `json:"name" binding:"required"`
+			Image string `bson:"image" json:"image"`
 			Price struct {
 				Start string `json:"start" binding:"required"`
 				End   string `json:"end" binding:"required"`
@@ -43,7 +44,8 @@ func Create(c *gin.Context) {
 	}
 
 	kuliner := &models.Culinary{
-		Name: request.Name,
+		Name:  request.Name,
+		Image: request.Image,
 		Price: struct {
 			Start string "bson:\"start\" json:\"start\""
 			End   string "bson:\"end\" json:\"end\""

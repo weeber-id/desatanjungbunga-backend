@@ -11,13 +11,15 @@ import (
 func GetOne(c *gin.Context) {
 	var (
 		request struct {
-			ID *string `form:"id" binding:"required"`
+			ID   *string `form:"id"`
+			Slug *string `form:"slug"`
 		}
 		response models.Response
 	)
 
-	if err := c.BindQuery(&request); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest(err.Error()))
+	c.BindQuery(&request)
+	if request.ID == nil && request.Slug == nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest("id atau slug harus diisi"))
 		return
 	}
 
@@ -26,6 +28,9 @@ func GetOne(c *gin.Context) {
 	var found bool
 	if request.ID != nil {
 		found, _ = lodging.GetByID(c, *request.ID)
+	}
+	if request.Slug != nil {
+		found, _ = lodging.GetBySlug(c, *request.Slug)
 	}
 
 	if !found {
