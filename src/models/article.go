@@ -11,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Article collection model
@@ -96,28 +95,14 @@ func (Articles) Collection() *mongo.Collection {
 // SortByTitle asc or desc
 func (a *Articles) SortByTitle(direction string) {
 	numDirection := a.getDirectionFromStringToInt(direction)
-	a.sort = append(a.sort, bson.E{Key: "title", Value: numDirection})
-}
-
-// SortByDate asc (oldest) or desc (latest)
-func (a *Articles) SortByDate(direction string) {
-	numDirection := a.getDirectionFromStringToInt(direction)
-	a.sort = append(a.sort, bson.E{Key: "updated_at", Value: numDirection})
+	a.aggregate = append(a.aggregate, bson.M{
+		"$sort": bson.M{"title": numDirection},
+	})
 }
 
 // Get multiple article from database
 func (a *Articles) Get(ctx context.Context) error {
-	filter := bson.D{}
-
-	opt := options.Find()
-	opt.SetSort(append(
-		a.sort,
-		bson.E{Key: "_id", Value: -1},
-	))
-	opt.SetSkip(a.pagination.skip)
-	opt.SetLimit(a.pagination.limit)
-
-	cur, err := a.Collection().Find(ctx, filter, opt)
+	cur, err := a.Collection().Aggregate(ctx, a.aggregate)
 	if err != nil {
 		return err
 	}

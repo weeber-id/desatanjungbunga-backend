@@ -114,35 +114,25 @@ func (Discussions) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Discussion)
 }
 
-// SortByDate asc (oldest) or desc (latest)
-func (d *Discussions) SortByDate(direction string) {
-	numDirection := d.getDirectionFromStringToInt(direction)
-	d.sort = append(d.sort, bson.E{Key: "created_at", Value: numDirection})
-}
-
 // FilterOnlyQuestion query
 func (d *Discussions) FilterOnlyQuestion() {
-	d.filter = append(d.filter, bson.E{Key: "parent_id", Value: nil})
+	d.aggregate = append(d.aggregate, bson.M{
+		"$match": bson.M{"parent_id": nil},
+	})
 }
 
 // FilterOnlyAnswer query
 func (d *Discussions) FilterOnlyAnswer(parentID string) {
 	parentObjectID, _ := primitive.ObjectIDFromHex(parentID)
 
-	d.filter = append(d.filter, bson.E{Key: "parent_id", Value: parentObjectID})
+	d.aggregate = append(d.aggregate, bson.M{
+		"$match": bson.M{"parent_id": parentObjectID},
+	})
 }
 
 // Get from discussion from database
 func (d *Discussions) Get(ctx context.Context, showQuestion bool) error {
-	opt := options.Find()
-	opt.SetSort(append(
-		d.sort,
-		bson.E{Key: "_id", Value: -1},
-	))
-	opt.SetSkip(d.pagination.skip)
-	opt.SetLimit(d.pagination.limit)
-
-	cur, err := d.Collection().Find(ctx, d.filter, opt)
+	cur, err := d.Collection().Aggregate(ctx, d.aggregate)
 	if err != nil {
 		return err
 	}

@@ -36,11 +36,7 @@ type BaseContent struct {
 
 // baseList tools for multiple item
 type baseList struct {
-	sort       bson.D
-	pagination struct {
-		skip  int64
-		limit int64
-	}
+	aggregate []bson.M
 }
 
 func (baseList) getDirectionFromStringToInt(direction string) int {
@@ -56,9 +52,21 @@ func (baseList) getDirectionFromStringToInt(direction string) int {
 	return numDirection
 }
 
-// SetPagination query
-// page start from 1
-func (l *baseList) SetPagination(page int64, contentPerPage int64) {
-	l.pagination.skip = (page - 1) * contentPerPage
-	l.pagination.limit = contentPerPage
+// SortByDate asc (oldest) or desc (latest)
+func (l *baseList) SortByDate(direction string) {
+	numDirection := l.getDirectionFromStringToInt(direction)
+	l.aggregate = append(l.aggregate, bson.M{
+		"$sort": bson.M{"updated_at": numDirection},
+	})
+}
+
+// FilterByPaginate aggregate
+func (l *baseList) FilterByPaginate(page int, contentPerPage int) {
+	l.aggregate = append(l.aggregate, bson.M{
+		"$skip": (page - 1) * contentPerPage,
+	})
+
+	l.aggregate = append(l.aggregate, bson.M{
+		"$limit": contentPerPage,
+	})
 }

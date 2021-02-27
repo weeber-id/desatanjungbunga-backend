@@ -47,8 +47,8 @@ func GetMultiple(c *gin.Context) {
 		request struct {
 			SortTitle      *string `form:"sort_title"`
 			SortDate       *string `form:"sort_date"`
-			Page           *int64  `form:"page"`
-			ContentPerPage *int64  `form:"content_per_page"`
+			Page           *int    `form:"page"`
+			ContentPerPage *int    `form:"content_per_page"`
 		}
 		response models.Response
 	)
@@ -64,7 +64,7 @@ func GetMultiple(c *gin.Context) {
 		articles.SortByDate(*request.SortDate)
 	}
 	if request.Page != nil && request.ContentPerPage != nil {
-		articles.SetPagination(*request.Page, *request.ContentPerPage)
+		articles.FilterByPaginate(*request.Page, *request.ContentPerPage)
 	}
 
 	if err := articles.Get(c); err != nil {

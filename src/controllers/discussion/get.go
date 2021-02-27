@@ -13,8 +13,8 @@ func GetMultiple(c *gin.Context) {
 		ParentID       *string `form:"question_id"`
 		ShowQuestion   bool    `form:"show_question"`
 		SortDate       *string `form:"sort_date"`
-		Page           *int64  `form:"page"`
-		ContentPerPage *int64  `form:"content_per_page"`
+		Page           *int    `form:"page"`
+		ContentPerPage *int    `form:"content_per_page"`
 	}
 
 	c.BindQuery(&request)
@@ -24,14 +24,15 @@ func GetMultiple(c *gin.Context) {
 	if request.SortDate != nil {
 		discussion.SortByDate(*request.SortDate)
 	}
-	if request.Page != nil && request.ContentPerPage != nil {
-		discussion.SetPagination(*request.Page, *request.ContentPerPage)
-	}
 
 	if request.ParentID != nil {
 		discussion.FilterOnlyAnswer(*request.ParentID)
 	} else {
 		discussion.FilterOnlyQuestion()
+	}
+
+	if request.Page != nil && request.ContentPerPage != nil {
+		discussion.FilterByPaginate(*request.Page, *request.ContentPerPage)
 	}
 
 	if err := discussion.Get(c, request.ShowQuestion); err != nil {
