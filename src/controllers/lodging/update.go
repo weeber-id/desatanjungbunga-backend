@@ -15,6 +15,7 @@ func Update(c *gin.Context) {
 		}
 		requestBody struct {
 			Name  string `json:"name" binding:"required"`
+			Image string `bson:"image" json:"image"`
 			Price struct {
 				Value string `json:"value" binding:"required"`
 				Unit  string `json:"unit" binding:"required"`
@@ -48,6 +49,7 @@ func Update(c *gin.Context) {
 	}
 
 	lodging.Name = requestBody.Name
+	lodging.Image = requestBody.Image
 
 	lodging.Price = struct {
 		Value string "bson:\"value\" json:\"value\""

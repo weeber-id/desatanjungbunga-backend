@@ -12,6 +12,7 @@ func Create(c *gin.Context) {
 	var (
 		request struct {
 			Name  string `json:"name" binding:"required"`
+			Image string `bson:"image" json:"image"`
 			Price struct {
 				Value string `json:"value" binding:"required"`
 				Unit  string `json:"unit" binding:"required"`
@@ -34,7 +35,8 @@ func Create(c *gin.Context) {
 	}
 
 	lodging := &models.Lodging{
-		Name: request.Name,
+		Name:  request.Name,
+		Image: request.Image,
 
 		Price: struct {
 			Value string "bson:\"value\" json:\"value\""

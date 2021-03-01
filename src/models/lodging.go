@@ -19,6 +19,7 @@ type Lodging struct {
 	BaseContent `bson:",inline"`
 
 	Name  string `bson:"name" json:"name"`
+	Image string `bson:"image" json:"image"`
 	Slug  string `bson:"slug" json:"slug"`
 	Price struct {
 		Value string `bson:"value" json:"value"`

@@ -18,6 +18,7 @@ type Handcraft struct {
 	BaseContent `bson:",inline"`
 
 	Name          string `bson:"name" json:"name"`
+	Image         string `bson:"image" json:"image"`
 	Price         string `bson:"price" json:"price"`
 	Slug          string `bson:"slug" json:"slug"`
 	OperationTime struct {

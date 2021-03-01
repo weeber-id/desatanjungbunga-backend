@@ -12,6 +12,7 @@ func Create(c *gin.Context) {
 	var (
 		request struct {
 			Name          string `json:"name" binding:"required"`
+			Image         string `bson:"image" json:"image"`
 			Price         string `json:"price" binding:"required"`
 			OperationTime struct {
 				From struct {
@@ -40,6 +41,7 @@ func Create(c *gin.Context) {
 
 	handcraft := &models.Handcraft{
 		Name:  request.Name,
+		Image: request.Image,
 		Price: request.Price,
 
 		OperationTime: struct {

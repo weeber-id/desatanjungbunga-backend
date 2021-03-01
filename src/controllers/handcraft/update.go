@@ -15,6 +15,7 @@ func Update(c *gin.Context) {
 		}
 		requestBody struct {
 			Name          string `json:"name" binding:"required"`
+			Image         string `bson:"image" json:"image"`
 			Price         string `json:"price" binding:"required"`
 			OperationTime struct {
 				From struct {
@@ -53,6 +54,7 @@ func Update(c *gin.Context) {
 	}
 
 	handcraft.Name = requestBody.Name
+	handcraft.Image = requestBody.Image
 	handcraft.Price = requestBody.Price
 
 	handcraft.OperationTime = struct {
