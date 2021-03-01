@@ -50,6 +50,10 @@ func GetMultiple(c *gin.Context) {
 			Page           *int    `form:"page"`
 			ContentPerPage *int    `form:"content_per_page"`
 		}
+		responseData struct {
+			Data    interface{} `json:"data"`
+			MaxPage uint        `json:"max_page"`
+		}
 		response models.Response
 	)
 
@@ -70,5 +74,7 @@ func GetMultiple(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, response.SuccessDataList(lodgings.Data()))
+	responseData.Data = lodgings.Data()
+
+	c.JSON(http.StatusOK, response.SuccessDataList(responseData))
 }
