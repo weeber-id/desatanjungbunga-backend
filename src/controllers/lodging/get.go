@@ -37,6 +37,7 @@ func GetOne(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusNotFound, response.ErrorDataNotFound())
 		return
 	}
+	lodging.LoadFacilitiesDetail(c)
 
 	c.JSON(http.StatusOK, response.SuccessData(lodging))
 }
@@ -77,4 +78,20 @@ func GetMultiple(c *gin.Context) {
 	responseData.Data = lodgings.Data()
 
 	c.JSON(http.StatusOK, response.SuccessDataList(responseData))
+}
+
+// GetFacilities controller
+func GetFacilities(c *gin.Context) {
+	var (
+		response models.Response
+	)
+
+	facilities := new(models.MultipleLodgingFacility)
+
+	if err := facilities.Get(c); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.SuccessDataList(facilities.Data()))
 }

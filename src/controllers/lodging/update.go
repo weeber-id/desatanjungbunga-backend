@@ -71,6 +71,7 @@ func Update(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
 		return
 	}
+	lodging.LoadFacilitiesDetail(c)
 
 	c.JSON(http.StatusOK, response.SuccessData(lodging))
 }

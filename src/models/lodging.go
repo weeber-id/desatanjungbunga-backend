@@ -11,7 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
-	"go.mongodb.org/mongo-driver/mongo/options"
 )
 
 // Lodging structure model
@@ -78,6 +77,17 @@ func (l *Lodging) GetByID(ctx context.Context, id string) (found bool, err error
 func (l *Lodging) GetBySlug(ctx context.Context, slug string) (found bool, err error) {
 	err = l.Collection().FindOne(ctx, bson.M{"slug": slug}).Decode(l)
 	return l.IsFoundFromError(err), err
+}
+
+// LoadFacilitiesDetail after query
+func (l *Lodging) LoadFacilitiesDetail(ctx context.Context) error {
+	facilities := new(MultipleLodgingFacility)
+	if err := facilities.GetByIDs(ctx, l.FacilitiesID); err != nil {
+		return err
+	}
+
+	l.Facilities = facilities.Data()
+	return nil
 }
 
 // Update lodging to database
@@ -198,14 +208,38 @@ func (MultipleLodgingFacility) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.LodgindFacilities)
 }
 
-// Get multiple facility from database
+// GetByIDs multiple facility from database
+func (l *MultipleLodgingFacility) GetByIDs(ctx context.Context, ids []string) error {
+	var objectIDs []primitive.ObjectID
+
+	for _, idstring := range ids {
+		objectID, err := primitive.ObjectIDFromHex(idstring)
+		if err != nil {
+			continue
+		}
+		objectIDs = append(objectIDs, objectID)
+	}
+
+	cur, err := l.Collection().Find(ctx, bson.M{
+		"_id": bson.M{"$in": objectIDs},
+	})
+	if err != nil {
+		return err
+	}
+
+	for cur.Next(ctx) {
+		var facility LodgingFacility
+
+		cur.Decode(&facility)
+		l.data = append(l.data, facility)
+	}
+
+	return nil
+}
+
+// Get all execution query
 func (l *MultipleLodgingFacility) Get(ctx context.Context) error {
-	filter := bson.D{}
-
-	opt := options.Find()
-	opt.SetSort(bson.M{"name": 1})
-
-	cur, err := l.Collection().Find(ctx, filter, opt)
+	cur, err := l.Collection().Find(ctx, bson.M{})
 	if err != nil {
 		return err
 	}

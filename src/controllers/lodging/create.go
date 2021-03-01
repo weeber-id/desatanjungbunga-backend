@@ -62,3 +62,31 @@ func Create(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response.SuccessDataCreated(lodging))
 }
+
+// CreateFacilities controller
+func CreateFacilities(c *gin.Context) {
+	var (
+		request struct {
+			Name string `json:"name" binding:"required"`
+			Icon string `json:"icon" binding:"required"`
+		}
+		response models.Response
+	)
+
+	if err := c.BindJSON(&request); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest(err.Error()))
+		return
+	}
+
+	facilities := &models.LodgingFacility{
+		Name: request.Name,
+		Icon: request.Icon,
+	}
+
+	if err := facilities.Create(c); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer((err)))
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.SuccessDataCreated(facilities))
+}

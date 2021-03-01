@@ -102,6 +102,8 @@ func main() {
 			admin.POST("/lodging/create", lodging.Create)
 			admin.POST("/lodging/update", lodging.Update)
 			admin.POST("/lodging/delete", lodging.Delete)
+			admin.GET("/lodging/facilities", lodging.GetFacilities)
+			admin.POST("/lodging/facility/create", lodging.CreateFacilities)
 
 			admin.GET("/discussion", discussion.GetMultiple)
 			admin.POST("/discussion/create", discussion.Create)
