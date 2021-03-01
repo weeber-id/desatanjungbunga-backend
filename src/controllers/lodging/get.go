@@ -46,6 +46,7 @@ func GetOne(c *gin.Context) {
 func GetMultiple(c *gin.Context) {
 	var (
 		request struct {
+			Search         *string `form:"search"`
 			SortName       *string `form:"sort_title"`
 			SortDate       *string `form:"sort_date"`
 			Page           *int    `form:"page"`
@@ -58,8 +59,13 @@ func GetMultiple(c *gin.Context) {
 		response models.Response
 	)
 
+	c.BindQuery(&request)
+
 	lodgings := new(models.MultipleLodging)
 
+	if request.Search != nil {
+		lodgings.FilterBySearch(*request.Search)
+	}
 	if request.SortName != nil {
 		lodgings.SortByName(*request.SortName)
 	}

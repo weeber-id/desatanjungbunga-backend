@@ -60,6 +60,16 @@ func (l *baseList) SortByDate(direction string) {
 	})
 }
 
+func (l *baseList) FilterBySearch(keyword string) {
+	l.aggregate = append(l.aggregate, bson.M{
+		"$match": bson.M{"$text": bson.M{"$search": keyword}},
+	})
+
+	l.aggregate = append(l.aggregate, bson.M{
+		"$sort": bson.M{"score": bson.M{"$meta": "textScore"}},
+	})
+}
+
 // FilterByPaginate aggregate
 func (l *baseList) FilterByPaginate(page int, contentPerPage int) {
 	l.aggregate = append(l.aggregate, bson.M{

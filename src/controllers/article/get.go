@@ -45,6 +45,7 @@ func GetOne(c *gin.Context) {
 func GetMultiple(c *gin.Context) {
 	var (
 		request struct {
+			Search         *string `form:"search"`
 			SortTitle      *string `form:"sort_title"`
 			SortDate       *string `form:"sort_date"`
 			Page           *int    `form:"page"`
@@ -61,6 +62,9 @@ func GetMultiple(c *gin.Context) {
 
 	articles := new(models.Articles)
 
+	if request.Search != nil {
+		articles.FilterBySearch(*request.Search)
+	}
 	if request.SortTitle != nil {
 		articles.SortByTitle(*request.SortTitle)
 	}
