@@ -4,7 +4,7 @@ jobs:
     docker:
       - image: docker:19.03.8
     environment:
-      IMAGE_NAME: asia.gcr.io/dealio-279907/dealio-backend-colt
+      IMAGE_NAME: bayu3490/tanjungbunga-backend
     working_directory: /app
     resource_class: small
     steps:
