@@ -1,0 +1,45 @@
+version: 2.1
+jobs:
+  build-upload:
+    docker:
+      - image: docker:19.03.8
+    environment:
+      IMAGE_NAME: asia.gcr.io/dealio-279907/dealio-backend-colt
+    working_directory: /app
+    resource_class: small
+    steps:
+      - checkout
+      - setup_remote_docker
+
+      - run:
+          name: Generate Docker Image Name
+          command: |
+            echo 'export VERSION=`cat VERSION`-build-${CIRCLE_SHA1:0:4}' >> $BASH_ENV
+            source $BASH_ENV
+            echo 'export IMAGE_NAME=${IMAGE_NAME}:${VERSION}' >> $BASH_ENV
+
+      - run:
+          name: Build Docker Image
+          command: | 
+            source $BASH_ENV
+            docker build -t $IMAGE_NAME .
+
+      - run:
+          name: Authentication to Container Registry
+          command: echo $access_token | docker login --username bayu3490 --password-stdin
+
+      - run:
+          name: Pushing Docker Image to Container Registry
+          command: |
+            source $BASH_ENV
+            docker push $IMAGE_NAME
+
+workflows:
+  version: 2
+  build-and-upload:
+    jobs:
+      - build-upload:
+          context: weeber-context
+          filters:
+            branches:
+              only: staging
