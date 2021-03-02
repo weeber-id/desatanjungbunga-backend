@@ -16,6 +16,7 @@ import (
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/kuliner"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/lodging"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/media"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/search"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/travel"
 	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
 	"github.com/weeber-id/desatanjungbunga-backend/src/services"
@@ -48,6 +49,8 @@ func main() {
 		root.GET("/", controllers.HealthCheck)
 		root.POST("/login", account.AdminLogin)
 		root.POST("/logout", account.AdminLogut)
+
+		root.GET("/search", search.GetSearch)
 
 		root.GET("/article", article.GetOne)
 		root.GET("/articles", article.GetMultiple)
