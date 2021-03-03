@@ -71,9 +71,16 @@ func GetMultiple(c *gin.Context) {
 	if request.SortDate != nil {
 		articles.SortByDate(*request.SortDate)
 	}
+
 	if request.Page != nil && request.ContentPerPage != nil {
 		articles.FilterByPaginate(*request.Page, *request.ContentPerPage)
 	}
+
+	maxPage := make(chan uint)
+	defer close(maxPage)
+	go func() {
+		maxPage <- articles.CountMaxPage(c)
+	}()
 
 	if err := articles.Get(c); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
@@ -81,6 +88,7 @@ func GetMultiple(c *gin.Context) {
 	}
 
 	responseData.Data = articles.Data()
+	responseData.MaxPage = <-maxPage
 
 	c.JSON(http.StatusOK, response.SuccessDataList(responseData))
 }

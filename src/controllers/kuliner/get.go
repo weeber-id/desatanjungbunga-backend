@@ -75,12 +75,19 @@ func GetMultiple(c *gin.Context) {
 		multiKuliner.FilterByPaginate(*request.Page, *request.ContentPerPage)
 	}
 
+	maxPage := make(chan uint)
+	defer close(maxPage)
+	go func() {
+		maxPage <- multiKuliner.CountMaxPage(c)
+	}()
+
 	if err := multiKuliner.Get(c); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
 		return
 	}
 
 	responseData.Data = multiKuliner.Data()
+	responseData.MaxPage = <-maxPage
 
 	c.JSON(http.StatusOK, response.SuccessDataList(responseData))
 }

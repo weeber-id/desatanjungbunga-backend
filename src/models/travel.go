@@ -127,6 +127,11 @@ func (w *MultipleWisata) Get(ctx context.Context) error {
 	return nil
 }
 
+// CountMaxPage execution
+func (w *MultipleWisata) CountMaxPage(ctx context.Context) uint {
+	return w.countMaxPage(ctx, w.Collection())
+}
+
 // Data wisata
 func (w *MultipleWisata) Data() []Travel {
 	return w.data

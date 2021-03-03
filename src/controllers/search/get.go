@@ -76,32 +76,77 @@ func GetSearch(c *gin.Context) {
 	wg.Add(5)
 	go func() {
 		defer wg.Done()
+
+		maxPage := make(chan uint)
+		defer close(maxPage)
+		go func() {
+			maxPage <- articles.CountMaxPage(c)
+		}()
+
 		articles.Get(c)
+
 		responseData.Article.Data = articles.Data()
+		responseData.Article.MaxPage = <-maxPage
 	}()
 
 	go func() {
 		defer wg.Done()
+
+		maxPage := make(chan uint)
+		defer close(maxPage)
+		go func() {
+			maxPage <- culinaries.CountMaxPage(c)
+		}()
+
 		culinaries.Get(c)
+
 		responseData.Culinary.Data = culinaries.Data()
+		responseData.Culinary.MaxPage = <-maxPage
 	}()
 
 	go func() {
 		defer wg.Done()
+
+		maxPage := make(chan uint)
+		defer close(maxPage)
+		go func() {
+			maxPage <- handcrafts.CountMaxPage(c)
+		}()
+
 		handcrafts.Get(c)
+
 		responseData.Handcraft.Data = handcrafts.Data()
+		responseData.Handcraft.MaxPage = <-maxPage
 	}()
 
 	go func() {
 		defer wg.Done()
+
+		maxPage := make(chan uint)
+		defer close(maxPage)
+		go func() {
+			maxPage <- lodgings.CountMaxPage(c)
+		}()
+
 		lodgings.Get(c)
+
 		responseData.Lodging.Data = lodgings.Data()
+		responseData.Lodging.MaxPage = <-maxPage
 	}()
 
 	go func() {
 		defer wg.Done()
+
+		maxPage := make(chan uint)
+		defer close(maxPage)
+		go func() {
+			maxPage <- travels.CountMaxPage(c)
+		}()
+
 		travels.Get(c)
+
 		responseData.Travel.Data = travels.Data()
+		responseData.Travel.MaxPage = <-maxPage
 	}()
 
 	wg.Wait()

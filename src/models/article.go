@@ -118,6 +118,11 @@ func (a *Articles) Get(ctx context.Context) error {
 	return nil
 }
 
+// CountMaxPage execution
+func (a *Articles) CountMaxPage(ctx context.Context) uint {
+	return a.countMaxPage(ctx, a.Collection())
+}
+
 // Data article
 func (a *Articles) Data() []Article {
 	return a.data

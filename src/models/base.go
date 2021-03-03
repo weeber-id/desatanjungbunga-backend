@@ -1,7 +1,9 @@
 package models
 
 import (
+	"context"
 	"log"
+	"math"
 	"time"
 
 	"go.mongodb.org/mongo-driver/bson"
@@ -37,6 +39,9 @@ type BaseContent struct {
 // baseList tools for multiple item
 type baseList struct {
 	aggregate []bson.M
+
+	aggregateSearch []bson.M
+	contentPerPage  int
 }
 
 func (baseList) getDirectionFromStringToInt(direction string) int {
@@ -61,17 +66,23 @@ func (l *baseList) SortByDate(direction string) {
 }
 
 func (l *baseList) FilterBySearch(keyword string) {
-	l.aggregate = append(l.aggregate, bson.M{
-		"$match": bson.M{"$text": bson.M{"$search": keyword}},
-	})
+	searchAggregate := []bson.M{
+		{
+			"$match": bson.M{"$text": bson.M{"$search": keyword}},
+		},
+		{
+			"$sort": bson.M{"score": bson.M{"$meta": "textScore"}},
+		},
+	}
 
-	l.aggregate = append(l.aggregate, bson.M{
-		"$sort": bson.M{"score": bson.M{"$meta": "textScore"}},
-	})
+	l.aggregate = append(l.aggregate, searchAggregate...)
+	l.aggregateSearch = append(l.aggregateSearch, searchAggregate...)
 }
 
 // FilterByPaginate aggregate
 func (l *baseList) FilterByPaginate(page int, contentPerPage int) {
+	l.contentPerPage = contentPerPage
+
 	l.aggregate = append(l.aggregate, bson.M{
 		"$skip": (page - 1) * contentPerPage,
 	})
@@ -79,4 +90,38 @@ func (l *baseList) FilterByPaginate(page int, contentPerPage int) {
 	l.aggregate = append(l.aggregate, bson.M{
 		"$limit": contentPerPage,
 	})
+}
+
+func (l *baseList) countMaxPage(ctx context.Context, coll *mongo.Collection) uint {
+	if l.contentPerPage == 0 {
+		l.contentPerPage = math.MaxInt32
+	}
+
+	l.aggregateSearch = append(l.aggregateSearch, bson.M{
+		"$group": bson.M{
+			"_id":   nil,
+			"count": bson.M{"$sum": 1},
+		},
+	})
+	l.aggregateSearch = append(l.aggregateSearch, bson.M{
+		"$project": bson.M{
+			"_id":      0,
+			"max_page": bson.M{"$ceil": bson.M{"$divide": bson.A{"$count", l.contentPerPage}}},
+		},
+	})
+
+	var result struct {
+		MaxPage uint `bson:"max_page"`
+	}
+
+	cur, err := coll.Aggregate(ctx, l.aggregateSearch)
+	if err != nil {
+		return 0
+	}
+
+	for cur.Next(ctx) {
+		cur.Decode(&result)
+	}
+
+	return result.MaxPage
 }

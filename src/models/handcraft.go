@@ -132,6 +132,11 @@ func (b *MultipleBelanja) Get(ctx context.Context) error {
 	return nil
 }
 
+// CountMaxPage execution
+func (b *MultipleBelanja) CountMaxPage(ctx context.Context) uint {
+	return b.countMaxPage(ctx, b.Collection())
+}
+
 // Data belanja
 func (b *MultipleBelanja) Data() []Handcraft {
 	return b.data

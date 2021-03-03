@@ -75,12 +75,19 @@ func GetMultiple(c *gin.Context) {
 		multiHandcraft.FilterByPaginate(*request.Page, *request.ContentPerPage)
 	}
 
+	maxPage := make(chan uint)
+	defer close(maxPage)
+	go func() {
+		maxPage <- multiHandcraft.CountMaxPage(c)
+	}()
+
 	if err := multiHandcraft.Get(c); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
 		return
 	}
 
 	responseData.Data = multiHandcraft.Data()
+	responseData.MaxPage = <-maxPage
 
 	c.JSON(http.StatusOK, response.SuccessDataList(responseData))
 }

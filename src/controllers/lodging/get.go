@@ -76,12 +76,19 @@ func GetMultiple(c *gin.Context) {
 		lodgings.FilterByPaginate(*request.Page, *request.ContentPerPage)
 	}
 
+	maxPage := make(chan uint)
+	defer close(maxPage)
+	go func() {
+		maxPage <- lodgings.CountMaxPage(c)
+	}()
+
 	if err := lodgings.Get(c); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
 		return
 	}
 
 	responseData.Data = lodgings.Data()
+	responseData.MaxPage = <-maxPage
 
 	c.JSON(http.StatusOK, response.SuccessDataList(responseData))
 }

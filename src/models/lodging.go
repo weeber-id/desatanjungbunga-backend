@@ -141,6 +141,11 @@ func (m *MultipleLodging) Get(ctx context.Context) error {
 	return nil
 }
 
+// CountMaxPage execution
+func (m *MultipleLodging) CountMaxPage(ctx context.Context) uint {
+	return m.countMaxPage(ctx, m.Collection())
+}
+
 // Data lodging
 func (m *MultipleLodging) Data() []Lodging {
 	return m.data
