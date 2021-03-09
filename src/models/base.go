@@ -32,6 +32,8 @@ func (Base) IsFoundFromError(err error) bool {
 
 // BaseContent model for collection in mongoDB
 type BaseContent struct {
+	aggregate []bson.M
+
 	Base      `bson:",inline"`
 	UpdatedAt time.Time `bson:"updated_at,omitempty" json:"updated_at,omitempty"`
 }
@@ -123,5 +125,8 @@ func (l *baseList) countMaxPage(ctx context.Context, coll *mongo.Collection) uin
 		cur.Decode(&result)
 	}
 
+	if result.MaxPage == 0 {
+		return 1
+	}
 	return result.MaxPage
 }

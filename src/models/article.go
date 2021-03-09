@@ -22,6 +22,8 @@ type Article struct {
 	Author     string `bson:"author" json:"author"`
 	Body       string `bson:"body" json:"body"`
 	Slug       string `bson:"slug" json:"slug"`
+
+	AuthorID primitive.ObjectID `bson:"author_id" json:"-"`
 }
 
 // Collection pointer to this model
@@ -30,9 +32,11 @@ func (Article) Collection() *mongo.Collection {
 }
 
 // Create new article to database
-func (a *Article) Create(ctx context.Context) error {
+func (a *Article) Create(ctx context.Context, author *Admin) error {
 	a.CreatedAt = time.Now()
 	a.UpdatedAt = time.Now()
+	a.AuthorID = author.ID
+	a.Author = author.Name
 
 	slug, err := tools.GenerateSlug(a.Title)
 	if err != nil {
@@ -98,6 +102,19 @@ func (a *Articles) SortByTitle(direction string) {
 	a.aggregate = append(a.aggregate, bson.M{
 		"$sort": bson.M{"title": numDirection},
 	})
+}
+
+// FilterByAuthorID pipeline
+func (a *Articles) FilterByAuthorID(authorID string) *Articles {
+	objectID, _ := primitive.ObjectIDFromHex(authorID)
+
+	filter := bson.M{
+		"$match": bson.M{"author_id": objectID},
+	}
+
+	a.aggregateSearch = append(a.aggregateSearch, filter)
+	a.aggregate = append(a.aggregate, filter)
+	return a
 }
 
 // Get multiple article from database

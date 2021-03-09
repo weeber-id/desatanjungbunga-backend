@@ -73,6 +73,7 @@ func main() {
 		admin.Use(middlewares.AdminAuthorization())
 		{
 			admin.POST("/register", account.AdminCreate)
+			admin.GET("/list", account.AdminList)
 
 			admin.POST("/media/upload/public", media.UploadPublicFile)
 

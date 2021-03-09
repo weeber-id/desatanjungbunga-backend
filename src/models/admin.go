@@ -45,6 +45,17 @@ func (a *Admin) GetByUsername(ctx context.Context, username string) (found bool,
 	return a.IsFoundFromError(err), err
 }
 
+// GetByID admin from database
+func (a *Admin) GetByID(ctx context.Context, id string) (found bool, err error) {
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return false, err
+	}
+
+	err = a.Collection().FindOne(ctx, bson.M{"_id": objectID}).Decode(a)
+	return a.IsFoundFromError(err), err
+}
+
 // Create new admin account
 func (a *Admin) Create(ctx context.Context) error {
 	a.CreatedAt = time.Now()
@@ -71,4 +82,36 @@ func (a *Admin) Update(ctx context.Context) error {
 // Delete admin from database
 func (a *Admin) Delete(ctx context.Context) error {
 	return a.Collection().FindOneAndDelete(ctx, bson.M{"_id": a.ID}).Err()
+}
+
+// Admins model database
+type Admins struct {
+	BaseContent `bson:",inline"`
+	data        []*Admin `bson:"data"`
+}
+
+// Collection pointer to this model
+func (Admins) Collection() *mongo.Collection {
+	return services.DB.Collection(variables.Collection.Admin)
+}
+
+// Get list of admin from database
+func (a *Admins) Get(ctx context.Context) error {
+	cur, err := a.Collection().Find(ctx, bson.M{})
+	if err != nil {
+		return err
+	}
+
+	for cur.Next(ctx) {
+		var admin Admin
+
+		cur.Decode(&admin)
+		a.data = append(a.data, &admin)
+	}
+	return nil
+}
+
+// Data attributes
+func (a *Admins) Data() []*Admin {
+	return a.data
 }

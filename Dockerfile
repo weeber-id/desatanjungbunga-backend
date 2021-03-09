@@ -10,6 +10,8 @@ RUN apk add tzdata
 ENV TZ=Asia/Jakarta
 RUN ln -snf /usr/share/zoneinfo/$TZ /etc/localtime && echo $TZ > /etc/timezone
 
+ENV GIN_MODE=release
+
 WORKDIR /app
 COPY --from=build-go-deps /work/main.out /app
 COPY --from=build-go-deps /work/VERSION /app

@@ -25,6 +25,16 @@ func (r *Response) ErrorBadRequest(message string) *Response {
 	return r
 }
 
+// ErrorForbidden form
+func (r *Response) ErrorForbidden() *Response {
+	r.Meta.Message = "Forbidden access"
+	r.Meta.Status = "forbidden"
+	r.Meta.Code = http.StatusForbidden
+
+	r.Data = nil
+	return r
+}
+
 // ErrorDataNotFound form
 func (r *Response) ErrorDataNotFound() *Response {
 	r.Meta.Message = "data tidak ditemukan"

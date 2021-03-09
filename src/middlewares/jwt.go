@@ -47,6 +47,22 @@ func GetClaims(c *gin.Context) *models.JwtClaims {
 	return claims
 }
 
+// GetAdmin from gin context
+func GetAdmin(c *gin.Context) *models.Admin {
+	var response models.Response
+
+	claims := GetClaims(c)
+
+	admin := new(models.Admin)
+	found, _ := admin.GetByID(c, claims.ID)
+	if !found {
+		c.AbortWithStatusJSON(http.StatusForbidden, response.ErrorForbidden())
+		log.Panicln("user not found")
+	}
+
+	return admin
+}
+
 // WriteAccessToken2Cookie middleware
 func WriteAccessToken2Cookie(c *gin.Context, adminID string, role int) {
 	claims := jwt.MapClaims{}
