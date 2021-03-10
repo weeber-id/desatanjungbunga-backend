@@ -2,6 +2,8 @@ package storages
 
 import (
 	"mime/multipart"
+
+	"github.com/google/uuid"
 )
 
 // BaseObject minio storage
@@ -33,4 +35,9 @@ func (b *BaseObject) LoadFromFileHeader(fileHeader *multipart.FileHeader, pathNa
 	b.File = buf
 
 	return nil
+}
+
+// LoadFromFileHeaderRandomName from gin file header with random filename
+func (b *BaseObject) LoadFromFileHeaderRandomName(fileHeader *multipart.FileHeader, pathName string) error {
+	return b.LoadFromFileHeader(fileHeader, pathName, uuid.New().String())
 }

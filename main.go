@@ -72,8 +72,12 @@ func main() {
 		admin := root.Group("/admin")
 		admin.Use(middlewares.AdminAuthorization())
 		{
-			admin.POST("/register", account.AdminCreate)
+			admin.GET("/", account.AdminInformation)
 			admin.GET("/list", account.AdminList)
+			admin.POST("/register", account.AdminCreate)
+			admin.POST("/delete", account.AdminDelete)
+			admin.POST("/update/password", account.AdminChangePassword)
+			admin.POST("/update/profile-picture", account.AdminChangeProfilePicture)
 
 			admin.POST("/media/upload/public", media.UploadPublicFile)
 

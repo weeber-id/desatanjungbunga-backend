@@ -25,12 +25,22 @@ func AdminCreate(c *gin.Context) {
 		return
 	}
 
+	// ====================== Check role =========================
 	claims := middlewares.GetClaims(c)
-	if claims.Role > request.Role {
-		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest("Forbidden request role"))
+	if claims.Role != 0 {
+		c.AbortWithStatusJSON(http.StatusForbidden, response.ErrorForbidden())
 		return
 	}
 
+	// ================ Check is username exist ? ================
+	admin := new(models.Admin)
+	found, _ := admin.GetByUsername(c, request.Username)
+	if found {
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest("username exist"))
+		return
+	}
+
+	// ================= Create new admin account ================
 	newAdmin := &models.Admin{
 		Name:     request.Name,
 		Username: request.Username,

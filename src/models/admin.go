@@ -16,10 +16,11 @@ import (
 type Admin struct {
 	BaseContent `bson:",inline"`
 
-	Name     string `bson:"name" json:"name"`
-	Username string `bson:"username" json:"username"`
-	Password string `bson:"password" json:"-"`
-	Role     int    `bson:"role" json:"role"`
+	Name           string `bson:"name" json:"name"`
+	Username       string `bson:"username" json:"username"`
+	Password       string `bson:"password" json:"-"`
+	Role           int    `bson:"role" json:"role"`
+	ProfilePicture string `bson:"profile_picture" json:"profile_picture"`
 }
 
 // Collection pointer to this model
