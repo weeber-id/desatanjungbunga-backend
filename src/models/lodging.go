@@ -24,8 +24,44 @@ type Lodging struct {
 		Value string `bson:"value" json:"value"`
 		Unit  string `bson:"unit" json:"unit"`
 	} `bson:"price" json:"price"`
-	OperationTime string `bson:"operation_time" json:"operation_time"`
-	Links         []struct {
+	OperationTime struct {
+		Monday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"monday" json:"monday"`
+		Tuesday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"tuesday" json:"tuesday"`
+		Wednesday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"wednesday" json:"wednesday"`
+		Thursday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"thursday" json:"thursday"`
+		Friday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"friday" json:"friday"`
+		Saturday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"saturday" json:"saturday"`
+		Sunday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"sunday" json:"sunday"`
+	} `bson:"operation_time" json:"operation_time"`
+	Links []struct {
 		Name string `bson:"name" json:"name"`
 		Link string `bson:"link" json:"link"`
 	} `bson:"links" json:"links"`
@@ -35,6 +71,8 @@ type Lodging struct {
 
 	// Custom fields
 	Facilities []LodgingFacility `bson:"-" json:"facilities"`
+
+	AuthorID primitive.ObjectID `bson:"author_id" json:"-"`
 }
 
 // Collection pointer to this model
@@ -43,9 +81,10 @@ func (Lodging) Collection() *mongo.Collection {
 }
 
 // Create new lodging to database
-func (l *Lodging) Create(ctx context.Context) error {
+func (l *Lodging) Create(ctx context.Context, author *Admin) error {
 	l.CreatedAt = time.Now()
 	l.UpdatedAt = time.Now()
+	l.AuthorID = author.ID
 
 	slug, err := tools.GenerateSlug(l.Name)
 	if err != nil {

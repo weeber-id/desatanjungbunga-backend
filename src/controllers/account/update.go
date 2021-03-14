@@ -35,7 +35,7 @@ func AdminChangePassword(c *gin.Context) {
 	}
 
 	// =================== Check old password ===================
-	if match := admin.IsPasswordMatch(request.OldPassword); match == false {
+	if match := admin.IsPasswordMatch(request.OldPassword); !match {
 		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest("wrong old password"))
 		return
 	}

@@ -15,23 +15,53 @@ import (
 
 // Travel collection model
 type Travel struct {
-	BaseContent   `bson:",inline"`
+	BaseContent `bson:",inline"`
+
 	Name          string `bson:"name" json:"name"`
 	Image         string `bson:"image" json:"image"`
 	Price         string `bson:"price" json:"price"`
 	Slug          string `bson:"slug" json:"slug"`
 	OperationTime struct {
-		From struct {
-			Day  string `bson:"day" json:"day"`
-			Time string `bson:"time" json:"time"`
-		} `bson:"from" json:"from"`
-		To struct {
-			Day  string `bson:"day" json:"day"`
-			Time string `bson:"time" json:"time"`
-		} `bson:"to" json:"to"`
+		Monday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"monday" json:"monday"`
+		Tuesday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"tuesday" json:"tuesday"`
+		Wednesday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"wednesday" json:"wednesday"`
+		Thursday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"thursday" json:"thursday"`
+		Friday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"friday" json:"friday"`
+		Saturday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"saturday" json:"saturday"`
+		Sunday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"sunday" json:"sunday"`
 	} `bson:"operation_time" json:"operation_time"`
 	ShortDescription string `bson:"short_description" json:"short_description"`
 	Description      string `bson:"description" json:"description"`
+
+	AuthorID primitive.ObjectID `bson:"author_id" json:"-"`
 }
 
 // Collection pointer to this model
@@ -40,9 +70,10 @@ func (Travel) Collection() *mongo.Collection {
 }
 
 // Create new wisata to database
-func (w *Travel) Create(ctx context.Context) error {
+func (w *Travel) Create(ctx context.Context, author *Admin) error {
 	w.CreatedAt = time.Now()
 	w.UpdatedAt = time.Now()
+	w.AuthorID = author.ID
 
 	slug, err := tools.GenerateSlug(w.Name)
 	if err != nil {

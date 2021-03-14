@@ -13,32 +13,8 @@ func Update(c *gin.Context) {
 		requestQuery struct {
 			ID string `form:"id" binding:"required"`
 		}
-		requestBody struct {
-			Name  string `json:"name" binding:"required"`
-			Image string `bson:"image" json:"image"`
-			Price struct {
-				Start string `json:"start" binding:"required"`
-				End   string `json:"end" binding:"required"`
-				Unit  string `json:"unit" binding:"required"`
-			} `json:"price" binding:"required"`
-			OperationTime struct {
-				From struct {
-					Day  string `json:"day" binding:"required"`
-					Time string `json:"time" binding:"required"`
-				} `json:"from" binding:"required"`
-				To struct {
-					Day  string `json:"day" binding:"required"`
-					Time string `json:"time" binding:"required"`
-				} `json:"to" binding:"required"`
-			} `json:"operation_time" binding:"required"`
-			Links []struct {
-				Name string `json:"name" binding:"required"`
-				Link string `json:"link" binding:"required"`
-			} `json:"links" binding:"required"`
-			ShortDescription string `json:"short_description" binding:"required"`
-			Description      string `json:"description" binding:"required"`
-		}
-		response models.Response
+		requestBody requestCreateUpdateCulinary
+		response    models.Response
 	)
 
 	if err := c.BindQuery(&requestQuery); err != nil {
@@ -57,33 +33,7 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	kuliner.Name = requestBody.Name
-	kuliner.Image = requestBody.Image
-
-	kuliner.Price = struct {
-		Start string "bson:\"start\" json:\"start\""
-		End   string "bson:\"end\" json:\"end\""
-		Unit  string "bson:\"unit\" json:\"unit\""
-	}(requestBody.Price)
-
-	kuliner.OperationTime = struct {
-		From struct {
-			Day  string "bson:\"day\" json:\"day\""
-			Time string "bson:\"time\" json:\"time\""
-		} "bson:\"from\" json:\"from\""
-		To struct {
-			Day  string "bson:\"day\" json:\"day\""
-			Time string "bson:\"time\" json:\"time\""
-		} "bson:\"to\" json:\"to\""
-	}(requestBody.OperationTime)
-
-	kuliner.Links = []struct {
-		Name string "bson:\"name\" json:\"name\""
-		Link string "bson:\"link\" json:\"link\""
-	}(requestBody.Links)
-
-	kuliner.ShortDescription = requestBody.ShortDescription
-	kuliner.Description = requestBody.Description
+	requestBody.WriteToModel(kuliner)
 
 	if err := kuliner.Update(c); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))

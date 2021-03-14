@@ -13,24 +13,8 @@ func Update(c *gin.Context) {
 		requestQuery struct {
 			ID string `form:"id" binding:"required"`
 		}
-		requestBody struct {
-			Name          string `json:"name" binding:"required"`
-			Image         string `json:"image" binding:"required"`
-			Price         string `json:"price" binding:"required"`
-			OperationTime struct {
-				From struct {
-					Day  string `json:"day" binding:"required"`
-					Time string `json:"time" binding:"required"`
-				} `json:"from" binding:"required"`
-				To struct {
-					Day  string `json:"day" binding:"required"`
-					Time string `json:"time" binding:"required"`
-				} `json:"to" binding:"required"`
-			} `json:"operation_time" binding:"required"`
-			ShortDescription string `json:"short_description" binding:"required"`
-			Description      string `json:"description" binding:"required"`
-		}
-		response models.Response
+		requestBody requestCreateUpdateTravel
+		response    models.Response
 	)
 
 	if err := c.BindQuery(&requestQuery); err != nil {
@@ -49,22 +33,7 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	travel.Name = requestBody.Name
-	travel.Image = requestBody.Image
-	travel.Price = requestBody.Price
-	travel.OperationTime = struct {
-		From struct {
-			Day  string "bson:\"day\" json:\"day\""
-			Time string "bson:\"time\" json:\"time\""
-		} "bson:\"from\" json:\"from\""
-		To struct {
-			Day  string "bson:\"day\" json:\"day\""
-			Time string "bson:\"time\" json:\"time\""
-		} "bson:\"to\" json:\"to\""
-	}(requestBody.OperationTime)
-	travel.ShortDescription = requestBody.ShortDescription
-	travel.Description = requestBody.Description
-
+	requestBody.WriteToModel(travel)
 	if err := travel.Update(c); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
 		return

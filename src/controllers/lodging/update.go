@@ -13,23 +13,8 @@ func Update(c *gin.Context) {
 		requestQuery struct {
 			ID string `form:"id" binding:"required"`
 		}
-		requestBody struct {
-			Name  string `json:"name" binding:"required"`
-			Image string `bson:"image" json:"image"`
-			Price struct {
-				Value string `json:"value" binding:"required"`
-				Unit  string `json:"unit" binding:"required"`
-			} `json:"price" binding:"required"`
-			OperationTime string `json:"operation_time" binding:"required"`
-			Links         []struct {
-				Name string `json:"name" binding:"required"`
-				Link string `json:"link" binding:"required"`
-			} `json:"links" binding:"required"`
-			FacilitiesID     []string `json:"facilities_id" binding:"required"`
-			ShortDescription string   `json:"short_description" binding:"required"`
-			Description      string   `json:"description" binding:"required"`
-		}
-		response models.Response
+		requestBody requestCreateUpdateLodging
+		response    models.Response
 	)
 
 	if err := c.BindQuery(&requestQuery); err != nil {
@@ -48,24 +33,7 @@ func Update(c *gin.Context) {
 		return
 	}
 
-	lodging.Name = requestBody.Name
-	lodging.Image = requestBody.Image
-
-	lodging.Price = struct {
-		Value string "bson:\"value\" json:\"value\""
-		Unit  string "bson:\"unit\" json:\"unit\""
-	}(requestBody.Price)
-
-	lodging.OperationTime = requestBody.OperationTime
-
-	lodging.Links = []struct {
-		Name string "bson:\"name\" json:\"name\""
-		Link string "bson:\"link\" json:\"link\""
-	}(requestBody.Links)
-
-	lodging.FacilitiesID = requestBody.FacilitiesID
-	lodging.ShortDescription = requestBody.ShortDescription
-	lodging.Description = requestBody.Description
+	requestBody.WriteToModel(lodging)
 
 	if err := lodging.Update(c); err != nil {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))

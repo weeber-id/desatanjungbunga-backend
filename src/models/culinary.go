@@ -26,14 +26,41 @@ type Culinary struct {
 		Unit  string `bson:"unit" json:"unit"`
 	} `bson:"price" json:"price"`
 	OperationTime struct {
-		From struct {
-			Day  string `bson:"day" json:"day"`
-			Time string `bson:"time" json:"time"`
-		} `bson:"from" json:"from"`
-		To struct {
-			Day  string `bson:"day" json:"day"`
-			Time string `bson:"time" json:"time"`
-		} `bson:"to" json:"to"`
+		Monday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"monday" json:"monday"`
+		Tuesday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"tuesday" json:"tuesday"`
+		Wednesday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"wednesday" json:"wednesday"`
+		Thursday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"thursday" json:"thursday"`
+		Friday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"friday" json:"friday"`
+		Saturday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"saturday" json:"saturday"`
+		Sunday struct {
+			Open bool   `bson:"open" json:"open"`
+			From string `bson:"from" json:"from"`
+			To   string `bson:"to" json:"to"`
+		} `bson:"sunday" json:"sunday"`
 	} `bson:"operation_time" json:"operation_time"`
 	Links []struct {
 		Name string `bson:"name" json:"name"`
@@ -41,6 +68,8 @@ type Culinary struct {
 	} `bson:"links" json:"links"`
 	ShortDescription string `bson:"short_description" json:"short_description"`
 	Description      string `bson:"description" json:"description"`
+
+	AuthorID primitive.ObjectID `bson:"author_id" json:"-"`
 }
 
 // Collection pointer to this model
@@ -49,9 +78,10 @@ func (Culinary) Collection() *mongo.Collection {
 }
 
 // Create new kuliner to database
-func (k *Culinary) Create(ctx context.Context) error {
+func (k *Culinary) Create(ctx context.Context, author *Admin) error {
 	k.CreatedAt = time.Now()
 	k.UpdatedAt = time.Now()
+	k.AuthorID = author.ID
 
 	slug, err := tools.GenerateSlug(k.Name)
 	if err != nil {
