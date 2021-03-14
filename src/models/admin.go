@@ -12,6 +12,11 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
+const (
+	AdminRoleSuperAdmin int = iota
+	AdminRoleSeller
+)
+
 // Admin model database
 type Admin struct {
 	BaseContent `bson:",inline"`
@@ -87,8 +92,9 @@ func (a *Admin) Delete(ctx context.Context) error {
 
 // Admins model database
 type Admins struct {
-	BaseContent `bson:",inline"`
-	data        []*Admin `bson:"data"`
+	baseList
+
+	data []*Admin `bson:"data"`
 }
 
 // Collection pointer to this model
@@ -96,9 +102,18 @@ func (Admins) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Admin)
 }
 
+// FilterByRole aggregation
+func (a *Admins) FilterByRole(role int) *Admins {
+	filter := bson.M{"$match": bson.M{"role": role}}
+
+	a.aggregate = append(a.aggregate, filter)
+	a.aggregateSearch = append(a.aggregateSearch, filter)
+	return a
+}
+
 // Get list of admin from database
 func (a *Admins) Get(ctx context.Context) error {
-	cur, err := a.Collection().Find(ctx, bson.M{})
+	cur, err := a.Collection().Aggregate(ctx, a.aggregate)
 	if err != nil {
 		return err
 	}
@@ -110,6 +125,11 @@ func (a *Admins) Get(ctx context.Context) error {
 		a.data = append(a.data, &admin)
 	}
 	return nil
+}
+
+// CountMaxPage execution
+func (a *Admins) CountMaxPage(ctx context.Context) uint {
+	return a.countMaxPage(ctx, a.Collection())
 }
 
 // Data attributes

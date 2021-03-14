@@ -2,6 +2,7 @@ package account
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
@@ -10,15 +11,48 @@ import (
 
 // AdminList contreoller
 func AdminList(c *gin.Context) {
-	var response models.Response
+	var (
+		wg      sync.WaitGroup
+		request struct {
+			Page           *int `form:"page"`
+			ContentPerPage *int `form:"content_per_page"`
+			Role           *int `form:"role"`
+		}
+		responseData responseAdminList
+		response     models.Response
+	)
 
-	admins := new(models.Admins)
-	if err := admins.Get(c); err != nil {
-		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
+	if err := c.BindQuery(&request); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest(err.Error()))
 		return
 	}
 
-	c.JSON(http.StatusOK, response.SuccessDataList(admins.Data()))
+	admins := new(models.Admins)
+	if request.Role != nil {
+		admins.FilterByRole(*request.Role)
+	}
+	if request.Page != nil && request.ContentPerPage != nil {
+		admins.FilterByPaginate(*request.Page, *request.ContentPerPage)
+	}
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		if err := admins.Get(c); err != nil {
+			c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
+			return
+		}
+		responseData.Data = admins.Data()
+	}()
+
+	go func() {
+		defer wg.Done()
+		responseData.MaxPage = admins.CountMaxPage(c)
+	}()
+
+	wg.Wait()
+
+	c.JSON(http.StatusOK, response.SuccessDataList(responseData))
 }
 
 // AdminInformation controller
