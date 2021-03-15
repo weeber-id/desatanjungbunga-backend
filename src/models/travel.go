@@ -60,6 +60,8 @@ type Travel struct {
 	} `bson:"operation_time" json:"operation_time"`
 	ShortDescription string `bson:"short_description" json:"short_description"`
 	Description      string `bson:"description" json:"description"`
+	Active           bool   `bson:"active" json:"active"`
+	Recommendation   bool   `bson:"recommendation" json:"recommendation"`
 
 	AuthorID primitive.ObjectID `bson:"author_id" json:"-"`
 }
@@ -74,6 +76,7 @@ func (w *Travel) Create(ctx context.Context, author *Admin) error {
 	w.CreatedAt = time.Now()
 	w.UpdatedAt = time.Now()
 	w.AuthorID = author.ID
+	w.Active = true
 
 	slug, err := tools.GenerateSlug(w.Name)
 	if err != nil {

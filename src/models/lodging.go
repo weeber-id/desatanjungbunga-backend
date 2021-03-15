@@ -68,6 +68,8 @@ type Lodging struct {
 	FacilitiesID     []string `bson:"facilities_id" json:"-"`
 	ShortDescription string   `bson:"short_description" json:"short_description"`
 	Description      string   `bson:"description" json:"description"`
+	Active           bool     `bson:"active" json:"active"`
+	Recommendation   bool     `bson:"recommendation" json:"recommendation"`
 
 	// Custom fields
 	Facilities []LodgingFacility `bson:"-" json:"facilities"`
@@ -85,6 +87,7 @@ func (l *Lodging) Create(ctx context.Context, author *Admin) error {
 	l.CreatedAt = time.Now()
 	l.UpdatedAt = time.Now()
 	l.AuthorID = author.ID
+	l.Active = true
 
 	slug, err := tools.GenerateSlug(l.Name)
 	if err != nil {

@@ -68,6 +68,8 @@ type Culinary struct {
 	} `bson:"links" json:"links"`
 	ShortDescription string `bson:"short_description" json:"short_description"`
 	Description      string `bson:"description" json:"description"`
+	Active           bool   `bson:"active" json:"active"`
+	Recommendation   bool   `bson:"recommendation" json:"recommendation"`
 
 	AuthorID primitive.ObjectID `bson:"author_id" json:"-"`
 }
@@ -82,6 +84,7 @@ func (k *Culinary) Create(ctx context.Context, author *Admin) error {
 	k.CreatedAt = time.Now()
 	k.UpdatedAt = time.Now()
 	k.AuthorID = author.ID
+	k.Active = true
 
 	slug, err := tools.GenerateSlug(k.Name)
 	if err != nil {

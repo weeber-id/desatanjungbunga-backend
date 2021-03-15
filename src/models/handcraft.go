@@ -64,6 +64,8 @@ type Handcraft struct {
 	} `bson:"links" json:"links"`
 	ShortDescription string `bson:"short_description" json:"short_description"`
 	Description      string `bson:"description" json:"description"`
+	Active           bool   `bson:"active" json:"active"`
+	Recommendation   bool   `bson:"recommendation" json:"recommendation"`
 
 	AuthorID primitive.ObjectID `bson:"author_id" json:"-"`
 }
@@ -78,6 +80,7 @@ func (b *Handcraft) Create(ctx context.Context, author *Admin) error {
 	b.CreatedAt = time.Now()
 	b.UpdatedAt = time.Now()
 	b.AuthorID = author.ID
+	b.Active = true
 
 	slug, err := tools.GenerateSlug(b.Name)
 	if err != nil {

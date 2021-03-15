@@ -17,11 +17,13 @@ import (
 type Article struct {
 	BaseContent `bson:",inline"`
 
-	Title      string `bson:"title" json:"title"`
-	ImageCover string `bson:"image_cover" json:"image_cover"`
-	Author     string `bson:"author" json:"author"`
-	Body       string `bson:"body" json:"body"`
-	Slug       string `bson:"slug" json:"slug"`
+	Title          string `bson:"title" json:"title"`
+	ImageCover     string `bson:"image_cover" json:"image_cover"`
+	Author         string `bson:"author" json:"author"`
+	Body           string `bson:"body" json:"body"`
+	Slug           string `bson:"slug" json:"slug"`
+	Active         bool   `bson:"active" json:"active"`
+	Recommendation bool   `bson:"recommendation" json:"recommendation"`
 
 	AuthorID primitive.ObjectID `bson:"author_id" json:"-"`
 }
@@ -37,6 +39,7 @@ func (a *Article) Create(ctx context.Context, author *Admin) error {
 	a.UpdatedAt = time.Now()
 	a.AuthorID = author.ID
 	a.Author = author.Name
+	a.Active = true
 
 	slug, err := tools.GenerateSlug(a.Title)
 	if err != nil {

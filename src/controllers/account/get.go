@@ -57,12 +57,29 @@ func AdminList(c *gin.Context) {
 
 // AdminInformation controller
 func AdminInformation(c *gin.Context) {
-	var response models.Response
+	var (
+		request struct {
+			ID *string `form:"id"`
+		}
+		response models.Response
+	)
+
+	if err := c.BindQuery(&request); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest(err.Error()))
+		return
+	}
 
 	claims := middlewares.GetClaims(c)
-
 	admin := new(models.Admin)
-	found, _ := admin.GetByID(c, claims.ID)
+
+	searchID := ""
+	if request.ID != nil {
+		searchID = *request.ID
+	} else {
+		searchID = claims.ID
+	}
+
+	found, _ := admin.GetByID(c, searchID)
 	if !found {
 		c.AbortWithStatusJSON(http.StatusNotFound, response.ErrorDataNotFound())
 		return
