@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
 	"github.com/weeber-id/desatanjungbunga-backend/src/models"
 )
 
@@ -58,12 +59,19 @@ func GetMultiple(c *gin.Context) {
 		response models.Response
 	)
 
-	c.BindQuery(&request)
+	if err := c.BindQuery(&request); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest(err.Error()))
+		return
+	}
 
+	claims := middlewares.GetClaims(c)
 	multiTravel := new(models.MultipleWisata)
 
 	if request.Search != nil {
 		multiTravel.FilterBySearch(*request.Search)
+	}
+	if claims.Role != 0 {
+		multiTravel.FilterByAuthorID(claims.ID)
 	}
 	if request.SortName != nil {
 		multiTravel.SortByName(*request.SortName)

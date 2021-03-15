@@ -163,6 +163,19 @@ func (m *MultipleLodging) SortByName(direction string) {
 	})
 }
 
+// FilterByAuthorID pipeline
+func (m *MultipleLodging) FilterByAuthorID(authorID string) *MultipleLodging {
+	objectID, _ := primitive.ObjectIDFromHex(authorID)
+
+	filter := bson.M{
+		"$match": bson.M{"author_id": objectID},
+	}
+
+	m.aggregateSearch = append(m.aggregateSearch, filter)
+	m.aggregate = append(m.aggregate, filter)
+	return m
+}
+
 // Get multiple lodging from database
 func (m *MultipleLodging) Get(ctx context.Context) error {
 	cur, err := m.Collection().Aggregate(ctx, m.aggregate)

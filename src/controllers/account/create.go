@@ -12,10 +12,11 @@ import (
 func AdminCreate(c *gin.Context) {
 	var (
 		request struct {
-			Name     string `json:"name" binding:"required"`
-			Username string `json:"username" binding:"required"`
-			Password string `json:"password" binding:"required"`
-			Role     int    `json:"role" binding:"required"`
+			Name           string `json:"name" binding:"required"`
+			Username       string `json:"username" binding:"required"`
+			Password       string `json:"password" binding:"required"`
+			Role           int    `json:"role" binding:"required"`
+			ProfilePicture string `json:"profile_picture" binding:"required"`
 		}
 		response models.Response
 	)
@@ -42,9 +43,10 @@ func AdminCreate(c *gin.Context) {
 
 	// ================= Create new admin account ================
 	newAdmin := &models.Admin{
-		Name:     request.Name,
-		Username: request.Username,
-		Role:     request.Role,
+		Name:           request.Name,
+		Username:       request.Username,
+		Role:           request.Role,
+		ProfilePicture: request.ProfilePicture,
 	}
 	newAdmin.SetPassword(request.Password)
 

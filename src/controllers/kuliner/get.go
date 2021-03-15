@@ -4,6 +4,7 @@ import (
 	"net/http"
 
 	"github.com/gin-gonic/gin"
+	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
 	"github.com/weeber-id/desatanjungbunga-backend/src/models"
 )
 
@@ -60,10 +61,14 @@ func GetMultiple(c *gin.Context) {
 
 	c.BindQuery(&request)
 
+	claims := middlewares.GetClaims(c)
 	multiKuliner := new(models.MultipleKuliner)
 
 	if request.Search != nil {
 		multiKuliner.FilterBySearch(*request.Search)
+	}
+	if claims.Role != 0 {
+		multiKuliner.FilterByAuthorID(claims.ID)
 	}
 	if request.SortName != nil {
 		multiKuliner.SortByName(*request.SortName)

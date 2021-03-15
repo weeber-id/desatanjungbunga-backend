@@ -149,6 +149,19 @@ func (k *MultipleKuliner) SortByName(direction string) {
 	})
 }
 
+// FilterByAuthorID pipeline
+func (k *MultipleKuliner) FilterByAuthorID(authorID string) *MultipleKuliner {
+	objectID, _ := primitive.ObjectIDFromHex(authorID)
+
+	filter := bson.M{
+		"$match": bson.M{"author_id": objectID},
+	}
+
+	k.aggregateSearch = append(k.aggregateSearch, filter)
+	k.aggregate = append(k.aggregate, filter)
+	return k
+}
+
 // Get multiple kuliner from database
 func (k *MultipleKuliner) Get(ctx context.Context) error {
 	cur, err := k.Collection().Aggregate(ctx, k.aggregate)

@@ -141,6 +141,19 @@ func (w *MultipleWisata) SortByName(direction string) {
 	})
 }
 
+// FilterByAuthorID pipeline
+func (w *MultipleWisata) FilterByAuthorID(authorID string) *MultipleWisata {
+	objectID, _ := primitive.ObjectIDFromHex(authorID)
+
+	filter := bson.M{
+		"$match": bson.M{"author_id": objectID},
+	}
+
+	w.aggregateSearch = append(w.aggregateSearch, filter)
+	w.aggregate = append(w.aggregate, filter)
+	return w
+}
+
 // Get multiple wisata from database
 func (w *MultipleWisata) Get(ctx context.Context) error {
 	cur, err := w.Collection().Aggregate(ctx, w.aggregate)

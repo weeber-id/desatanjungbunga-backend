@@ -145,6 +145,19 @@ func (b *MultipleBelanja) SortByName(direction string) {
 	})
 }
 
+// FilterByAuthorID pipeline
+func (b *MultipleBelanja) FilterByAuthorID(authorID string) *MultipleBelanja {
+	objectID, _ := primitive.ObjectIDFromHex(authorID)
+
+	filter := bson.M{
+		"$match": bson.M{"author_id": objectID},
+	}
+
+	b.aggregateSearch = append(b.aggregateSearch, filter)
+	b.aggregate = append(b.aggregate, filter)
+	return b
+}
+
 // Get multiple belanja from database
 func (b *MultipleBelanja) Get(ctx context.Context) error {
 	cur, err := b.Collection().Aggregate(ctx, b.aggregate)
