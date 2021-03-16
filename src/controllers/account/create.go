@@ -55,8 +55,5 @@ func AdminCreate(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "admin account created",
-		"data":    newAdmin,
-	})
+	c.JSON(http.StatusCreated, response.SuccessDataCreated(newAdmin))
 }

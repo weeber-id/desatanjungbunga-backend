@@ -10,10 +10,13 @@ import (
 
 // AdminLogin controller
 func AdminLogin(c *gin.Context) {
-	var request struct {
-		Username string `json:"username" binding:"required"`
-		Password string `json:"password" binding:"required"`
-	}
+	var (
+		request struct {
+			Username string `json:"username" binding:"required"`
+			Password string `json:"password" binding:"required"`
+		}
+		response models.Response
+	)
 
 	if err := c.BindJSON(&request); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
@@ -23,12 +26,12 @@ func AdminLogin(c *gin.Context) {
 	admin := new(models.Admin)
 	found, _ := admin.GetByUsername(c, request.Username)
 	if !found {
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "data not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, response.ErrorDataNotFound())
 		return
 	}
 
 	if !admin.IsPasswordMatch(request.Password) {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid credentials"})
+		c.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorDataNotFound())
 		return
 	}
 
@@ -46,7 +49,9 @@ func AdminLogin(c *gin.Context) {
 
 // AdminLogut controller
 func AdminLogut(c *gin.Context) {
+	var response models.Response
+
 	middlewares.DeleteAccessToken2Cookie(c)
 
-	c.JSON(http.StatusOK, gin.H{"message": "admin logout"})
+	c.JSON(http.StatusOK, response.SuccessData(nil))
 }

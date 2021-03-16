@@ -53,8 +53,5 @@ func GetMultiple(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"message": "OK",
-		"data":    discussion.Data(),
-	})
+	c.JSON(http.StatusOK, response.SuccessDataList(discussion.Data()))
 }

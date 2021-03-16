@@ -11,9 +11,12 @@ import (
 
 // UploadPublicFile to minio storages and give the public URL
 func UploadPublicFile(c *gin.Context) {
-	var req struct {
-		FolderName string `form:"folder_name" binding:"required"`
-	}
+	var (
+		req struct {
+			FolderName string `form:"folder_name" binding:"required"`
+		}
+		response models.Response
+	)
 
 	if err := c.ShouldBindWith(&req, binding.FormMultipart); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
@@ -22,7 +25,7 @@ func UploadPublicFile(c *gin.Context) {
 
 	fileHeader, err := c.FormFile("file")
 	if err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, gin.H{"error": "required file"})
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest(err.Error()))
 		return
 	}
 

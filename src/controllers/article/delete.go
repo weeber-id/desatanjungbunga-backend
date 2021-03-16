@@ -9,9 +9,12 @@ import (
 
 // Delete controller
 func Delete(c *gin.Context) {
-	var requestQuery struct {
-		ID string `form:"id" binding:"required"`
-	}
+	var (
+		requestQuery struct {
+			ID string `form:"id" binding:"required"`
+		}
+		response models.Response
+	)
 
 	if err := c.BindQuery(&requestQuery); err != nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
@@ -21,7 +24,7 @@ func Delete(c *gin.Context) {
 	article := new(models.Article)
 	found, _ := article.GetByID(c, requestQuery.ID)
 	if !found {
-		c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "data not found"})
+		c.AbortWithStatusJSON(http.StatusNotFound, response.ErrorDataNotFound())
 		return
 	}
 
@@ -30,5 +33,5 @@ func Delete(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "article deleted"})
+	c.JSON(http.StatusOK, response.SuccessData(nil))
 }

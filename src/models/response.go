@@ -25,6 +25,16 @@ func (r *Response) ErrorBadRequest(message string) *Response {
 	return r
 }
 
+// ErrorBadRequest form
+func (r *Response) ErrorUnauthorized() *Response {
+	r.Meta.Message = "anda harus logi terlebih dahulu"
+	r.Meta.Status = "not authorized"
+	r.Meta.Code = http.StatusUnauthorized
+
+	r.Data = nil
+	return r
+}
+
 // ErrorForbidden form
 func (r *Response) ErrorForbidden() *Response {
 	r.Meta.Message = "Forbidden access"

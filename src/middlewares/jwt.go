@@ -14,11 +14,13 @@ import (
 // AdminAuthorization using JWT
 func AdminAuthorization() gin.HandlerFunc {
 	return func(c *gin.Context) {
+		var response models.Response
+
 		jwtConfig := variables.JWTConfig
 
 		token, err := c.Cookie(jwtConfig.TokenName)
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "You must login before"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorUnauthorized())
 			return
 		}
 
@@ -28,7 +30,7 @@ func AdminAuthorization() gin.HandlerFunc {
 			return []byte(variables.JWTConfig.Key), nil
 		})
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "invalid access token"})
+			c.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorUnauthorized())
 			return
 		}
 
