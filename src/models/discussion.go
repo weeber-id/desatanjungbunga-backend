@@ -2,9 +2,11 @@ package models
 
 import (
 	"context"
+	"errors"
 	"time"
 
 	"github.com/weeber-id/desatanjungbunga-backend/src/services"
+	"github.com/weeber-id/desatanjungbunga-backend/src/tools"
 	"github.com/weeber-id/desatanjungbunga-backend/src/variables"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
@@ -16,10 +18,12 @@ import (
 type Discussion struct {
 	BaseContent `bson:",inline"`
 
-	ParentID primitive.ObjectID `bson:"parent_id,omitempty" json:"-"`
-	Name     string             `bson:"name" json:"name"`
-	Email    string             `bson:"email" json:"email"`
-	Body     string             `bson:"body" json:"body"`
+	ParentID    primitive.ObjectID `bson:"parent_id,omitempty" json:"-"`
+	Name        string             `bson:"name" json:"name"`
+	Email       string             `bson:"email" json:"email"`
+	Body        string             `bson:"body" json:"body"`
+	ContentName string             `bson:"content_name" json:"content_name"`
+	ContentID   primitive.ObjectID `bson:"content_id" json:"content_id"`
 
 	Questions []Discussion `bson:"-" json:"questions"`
 }
@@ -36,7 +40,7 @@ func (d *Discussion) SetParentID(parentID string) (found bool, err error) {
 
 	question := new(Discussion)
 	found, err = question.GetByID(ctx, parentID)
-	if found == false {
+	if !found {
 		return found, err
 	}
 
@@ -45,6 +49,27 @@ func (d *Discussion) SetParentID(parentID string) (found bool, err error) {
 		return true, err
 	}
 	return true, nil
+}
+
+func (d *Discussion) SetContentNameAndID(contentName string, contentID string) error {
+	allowedContentName := []string{
+		variables.Collection.Article,
+		variables.Collection.Travel,
+		variables.Collection.Culinary,
+		variables.Collection.Handcraft,
+		variables.Collection.Lodging,
+	}
+	if !tools.InArrayStrings(allowedContentName, contentName) {
+		return errors.New("invalid content name")
+	}
+	d.ContentName = contentName
+
+	objectContentID, err := primitive.ObjectIDFromHex(contentID)
+	if err != nil {
+		return err
+	}
+	d.ContentID = objectContentID
+	return nil
 }
 
 // Create new discussion to database
@@ -105,13 +130,41 @@ func (d *Discussion) Delete(ctx context.Context) error {
 type Discussions struct {
 	baseList
 
-	filter bson.D
-	data   []Discussion
+	data []Discussion
 }
 
 // Collection discussion mongo
 func (Discussions) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Discussion)
+}
+
+// FilterByContentNameID query
+func (d *Discussions) FilterByContentNameID(contentName string, contentID string) error {
+	objectID, err := primitive.ObjectIDFromHex(contentID)
+	if err != nil {
+		return err
+	}
+
+	allowedContentName := []string{
+		variables.Collection.Article,
+		variables.Collection.Travel,
+		variables.Collection.Culinary,
+		variables.Collection.Handcraft,
+		variables.Collection.Lodging,
+	}
+
+	if !tools.InArrayStrings(allowedContentName, contentName) {
+		return errors.New("invalid content name")
+	}
+
+	d.aggregate = append(d.aggregate, bson.M{
+		"$match": bson.D{
+			{Key: "content_name", Value: contentName},
+			{Key: "content_id", Value: objectID},
+		},
+	})
+
+	return nil
 }
 
 // FilterOnlyQuestion query

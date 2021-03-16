@@ -9,15 +9,22 @@ import (
 
 // Create controller
 func Create(c *gin.Context) {
-	var request struct {
-		ParentID *string `json:"question_id"`
-		Name     string  `json:"name" binding:"required"`
-		Email    string  `json:"email" binding:"required"`
-		Body     string  `json:"body" binding:"required"`
-	}
+	var (
+		request struct {
+			ParentID *string `json:"question_id"`
+
+			ContentName string `json:"content_name" binding:"required"`
+			ContentID   string `json:"content_id" binding:"required"`
+
+			Name  string `json:"name" binding:"required"`
+			Email string `json:"email" binding:"required"`
+			Body  string `json:"body" binding:"required"`
+		}
+		response models.Response
+	)
 
 	if err := c.BindJSON(&request); err != nil {
-		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest(err.Error()))
 		return
 	}
 
@@ -27,14 +34,19 @@ func Create(c *gin.Context) {
 		Body:  request.Body,
 	}
 
+	if err := discussion.SetContentNameAndID(request.ContentName, request.ContentID); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest("invalid content name and content id"))
+		return
+	}
+
 	if request.ParentID != nil {
 		found, err := discussion.SetParentID(*request.ParentID)
 		if !found {
-			c.AbortWithStatusJSON(http.StatusNotFound, gin.H{"error": "data not found"})
+			c.AbortWithStatusJSON(http.StatusNotFound, response.ErrorDataNotFound())
 			return
 		}
 		if err != nil {
-			c.AbortWithStatusJSON(http.StatusInternalServerError, gin.H{"error": "search question data"})
+			c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
 			return
 		}
 	}
@@ -44,8 +56,5 @@ func Create(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{
-		"message": "Discussion created",
-		"data":    discussion,
-	})
+	c.JSON(http.StatusCreated, response.SuccessDataCreated(discussion))
 }
