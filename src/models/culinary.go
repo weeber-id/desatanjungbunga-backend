@@ -182,6 +182,11 @@ func (k *MultipleKuliner) Get(ctx context.Context) error {
 	return nil
 }
 
+// CountDocuments execution
+func (k *MultipleKuliner) CountDocuments(ctx context.Context) uint {
+	return k.countDocuments(ctx, k.Collection())
+}
+
 // CountMaxPage execution
 func (k *MultipleKuliner) CountMaxPage(ctx context.Context) uint {
 	return k.countMaxPage(ctx, k.Collection())

@@ -94,6 +94,29 @@ func (l *baseList) FilterByPaginate(page int, contentPerPage int) {
 	})
 }
 
+func (l *baseList) countDocuments(ctx context.Context, coll *mongo.Collection) uint {
+	l.aggregate = append(l.aggregate, bson.M{
+		"$group": bson.M{
+			"_id":   nil,
+			"count": bson.M{"$sum": 1},
+		},
+	})
+
+	var result struct {
+		Count uint `bson:"count"`
+	}
+
+	cur, err := coll.Aggregate(ctx, l.aggregate)
+	if err != nil {
+		return 0
+	}
+
+	for cur.Next(ctx) {
+		cur.Decode(&result)
+	}
+	return result.Count
+}
+
 func (l *baseList) countMaxPage(ctx context.Context, coll *mongo.Collection) uint {
 	if l.contentPerPage == 0 {
 		l.contentPerPage = math.MaxInt32

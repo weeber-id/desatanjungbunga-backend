@@ -196,6 +196,11 @@ func (m *MultipleLodging) Get(ctx context.Context) error {
 	return nil
 }
 
+// CountDocuments execution
+func (m *MultipleLodging) CountDocuments(ctx context.Context) uint {
+	return m.countDocuments(ctx, m.Collection())
+}
+
 // CountMaxPage execution
 func (m *MultipleLodging) CountMaxPage(ctx context.Context) uint {
 	return m.countMaxPage(ctx, m.Collection())

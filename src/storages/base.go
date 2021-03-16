@@ -2,6 +2,7 @@ package storages
 
 import (
 	"mime/multipart"
+	"path"
 
 	"github.com/google/uuid"
 )
@@ -22,10 +23,10 @@ func (b *BaseObject) LoadFromFileHeader(fileHeader *multipart.FileHeader, pathNa
 	b.Size = fileHeader.Size
 
 	file, err := fileHeader.Open()
-	defer file.Close()
 	if err != nil {
 		return err
 	}
+	defer file.Close()
 
 	buf := make([]byte, fileHeader.Size)
 	_, err = file.Read(buf)
@@ -39,5 +40,6 @@ func (b *BaseObject) LoadFromFileHeader(fileHeader *multipart.FileHeader, pathNa
 
 // LoadFromFileHeaderRandomName from gin file header with random filename
 func (b *BaseObject) LoadFromFileHeaderRandomName(fileHeader *multipart.FileHeader, pathName string) error {
-	return b.LoadFromFileHeader(fileHeader, pathName, uuid.New().String())
+	filename := uuid.New().String() + path.Ext(fileHeader.Filename)
+	return b.LoadFromFileHeader(fileHeader, pathName, filename)
 }

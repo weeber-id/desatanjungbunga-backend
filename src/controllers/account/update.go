@@ -84,3 +84,18 @@ func AdminChangeProfilePicture(c *gin.Context) {
 
 	c.JSON(http.StatusOK, response.SuccessData(nil))
 }
+
+// AdminDeleteProfilePicture controller
+func AdminDeleteProfilePicture(c *gin.Context) {
+	var response models.Response
+
+	admin := middlewares.GetAdmin(c)
+	admin.ProfilePicture = ""
+
+	if err := admin.Update(c); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.SuccessData(admin))
+}

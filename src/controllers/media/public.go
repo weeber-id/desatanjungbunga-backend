@@ -28,7 +28,7 @@ func UploadPublicFile(c *gin.Context) {
 
 	// new public object
 	newObject := new(storages.PublicObject)
-	newObject.LoadFromFileHeader(fileHeader, req.FolderName, fileHeader.Filename)
+	newObject.LoadFromFileHeaderRandomName(fileHeader, req.FolderName)
 	newObject.Upload(c)
 
 	c.JSON(http.StatusOK, &models.Response{

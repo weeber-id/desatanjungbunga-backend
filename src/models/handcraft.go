@@ -178,6 +178,11 @@ func (b *MultipleBelanja) Get(ctx context.Context) error {
 	return nil
 }
 
+// CountDocuments execution
+func (b *MultipleBelanja) CountDocuments(ctx context.Context) uint {
+	return b.countDocuments(ctx, b.Collection())
+}
+
 // CountMaxPage execution
 func (b *MultipleBelanja) CountMaxPage(ctx context.Context) uint {
 	return b.countMaxPage(ctx, b.Collection())

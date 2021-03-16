@@ -174,6 +174,11 @@ func (w *MultipleWisata) Get(ctx context.Context) error {
 	return nil
 }
 
+// CountDocuments execution
+func (w *MultipleWisata) CountDocuments(ctx context.Context) uint {
+	return w.countDocuments(ctx, w.Collection())
+}
+
 // CountMaxPage execution
 func (w *MultipleWisata) CountMaxPage(ctx context.Context) uint {
 	return w.countMaxPage(ctx, w.Collection())

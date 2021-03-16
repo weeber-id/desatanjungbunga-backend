@@ -10,6 +10,7 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/account"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/analytics"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/article"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/discussion"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/handcraft"
@@ -78,6 +79,9 @@ func main() {
 			admin.POST("/delete", account.AdminDelete)
 			admin.POST("/update/password", account.AdminChangePassword)
 			admin.POST("/update/profile-picture", account.AdminChangeProfilePicture)
+			admin.POST("/update/profile-picture/delete", account.AdminDeleteProfilePicture)
+
+			admin.GET("/analytics/content-count", analytics.ContentCount)
 
 			admin.POST("/media/upload/public", media.UploadPublicFile)
 
