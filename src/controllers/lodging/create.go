@@ -29,6 +29,7 @@ func Create(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
 		return
 	}
+	lodging.LoadFacilitiesDetail(c)
 
 	c.JSON(http.StatusCreated, response.SuccessDataCreated(lodging))
 }
