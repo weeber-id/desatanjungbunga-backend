@@ -45,7 +45,7 @@ func main() {
 
 	router := gin.Default()
 	router.Use(middlewares.CORS())
-	root := router.Group("/api")
+	root := router.Group("/backend")
 	{
 		root.GET("/", controllers.HealthCheck)
 		root.POST("/login", account.AdminLogin)
