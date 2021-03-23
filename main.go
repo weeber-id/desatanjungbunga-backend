@@ -69,6 +69,8 @@ func main() {
 		root.GET("/lodgings", lodging.GetMultiple)
 
 		root.GET("/discussion", discussion.GetMultiple)
+		root.POST("/discussion/create", discussion.Create)
+		root.POST("/discussion/delete", discussion.Delete)
 
 		admin := root.Group("/admin")
 		admin.Use(middlewares.AdminAuthorization())
