@@ -2,6 +2,7 @@ package variables
 
 // Collection name in mongoDB
 var Collection = struct {
+	About      string
 	Admin      string
 	Discussion string
 	Article    string
@@ -12,6 +13,7 @@ var Collection = struct {
 	Lodging           string
 	LodgindFacilities string
 }{
+	About:      "about",
 	Admin:      "admin",
 	Discussion: "discussion",
 	Article:    "article",

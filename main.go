@@ -9,6 +9,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers"
+	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/about"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/account"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/analytics"
 	"github.com/weeber-id/desatanjungbunga-backend/src/controllers/article"
@@ -51,6 +52,8 @@ func main() {
 		root.POST("/login", account.AdminLogin)
 		root.POST("/logout", account.AdminLogut)
 
+		root.GET("/about", about.Get)
+
 		root.GET("/search", search.GetSearch)
 
 		root.GET("/article", article.GetOne)
@@ -82,6 +85,10 @@ func main() {
 			admin.POST("/update/password", account.AdminChangePassword)
 			admin.POST("/update/profile-picture", account.AdminChangeProfilePicture)
 			admin.POST("/update/profile-picture/delete", account.AdminDeleteProfilePicture)
+
+			admin.GET("/about", about.AdminGet)
+			admin.POST("/about/update", about.AdminUpdate)
+			admin.POST("/about/delete", about.AdminDelete)
 
 			admin.GET("/analytics/content-count", analytics.ContentCount)
 
