@@ -12,9 +12,10 @@ import (
 func Create(c *gin.Context) {
 	var (
 		request struct {
-			Title      string `json:"title" binding:"required"`
-			ImageCover string `json:"image_cover" binding:"required"`
-			Body       string `json:"body" binding:"required"`
+			Title      string   `json:"title" binding:"required"`
+			ImageCover string   `json:"image_cover" binding:"required"`
+			Body       string   `json:"body" binding:"required"`
+			RelatedIDs []string `json:"related_id"`
 		}
 		response models.Response
 	)
@@ -30,6 +31,7 @@ func Create(c *gin.Context) {
 		ImageCover: request.ImageCover,
 		Body:       request.Body,
 	}
+	article.SetRelatedIDs(request.RelatedIDs)
 
 	if err := article.Create(c, admin); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)

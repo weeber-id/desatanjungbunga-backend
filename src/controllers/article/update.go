@@ -15,9 +15,10 @@ func Update(c *gin.Context) {
 			ID string `form:"id" binding:"required"`
 		}
 		requestBody struct {
-			Title      string `json:"title" binding:"required"`
-			ImageCover string `json:"image_cover" binding:"required"`
-			Body       string `json:"body" binding:"required"`
+			Title      string   `json:"title" binding:"required"`
+			ImageCover string   `json:"image_cover" binding:"required"`
+			Body       string   `json:"body" binding:"required"`
+			RelatedIDs []string `json:"related_id"`
 		}
 		response models.Response
 	)
@@ -41,6 +42,7 @@ func Update(c *gin.Context) {
 	article.Title = requestBody.Title
 	article.ImageCover = requestBody.ImageCover
 	article.Body = requestBody.Body
+	article.SetRelatedIDs(requestBody.RelatedIDs)
 
 	if err := article.Update(c); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)

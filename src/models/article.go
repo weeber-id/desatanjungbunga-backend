@@ -17,20 +17,56 @@ import (
 type Article struct {
 	BaseContent `bson:",inline"`
 
-	Title          string `bson:"title" json:"title"`
-	ImageCover     string `bson:"image_cover" json:"image_cover"`
-	Author         string `bson:"author" json:"author"`
-	Body           string `bson:"body" json:"body"`
-	Slug           string `bson:"slug" json:"slug"`
-	Active         bool   `bson:"active" json:"active"`
-	Recommendation bool   `bson:"recommendation" json:"recommendation"`
+	Title          string               `bson:"title" json:"title"`
+	ImageCover     string               `bson:"image_cover" json:"image_cover"`
+	Author         string               `bson:"author" json:"author"`
+	Body           string               `bson:"body" json:"body"`
+	Slug           string               `bson:"slug" json:"slug"`
+	Active         bool                 `bson:"active" json:"active"`
+	Recommendation bool                 `bson:"recommendation" json:"recommendation"`
+	AuthorID       primitive.ObjectID   `bson:"author_id" json:"-"`
+	RelatedIDs     []primitive.ObjectID `bson:"related_ids" json:"-"`
 
-	AuthorID primitive.ObjectID `bson:"author_id" json:"-"`
+	AuthorDetail *Admin `bson:"-" json:"author_detail,omitempty"`
+
+	RelatedIDsString []string   `bson:"-" json:"related_id"`
+	RelatedDetails   []*Article `bson:"-" json:"related_details,omitempty"`
 }
 
 // Collection pointer to this model
 func (Article) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Article)
+}
+
+func (a *Article) WithAuthor(ctx context.Context) {
+	author := new(Admin)
+	author.GetByObjectID(ctx, a.AuthorID)
+	a.AuthorDetail = author
+}
+
+func (a *Article) WithRelated(ctx context.Context) {
+	for _, id := range a.RelatedIDs {
+		article := new(Article)
+		found, _ := article.GetByObjectID(ctx, id)
+		if !found {
+			continue
+		}
+		a.RelatedDetails = append(a.RelatedDetails, article)
+	}
+}
+
+func (a *Article) SetRelatedIDs(ids []string) {
+	a.RelatedIDsString = ids
+
+	objectIDs := []primitive.ObjectID{}
+	for _, row := range ids {
+		objectID, err := primitive.ObjectIDFromHex(row)
+		if err != nil {
+			continue
+		}
+		objectIDs = append(objectIDs, objectID)
+	}
+	a.RelatedIDs = objectIDs
 }
 
 // Create new article to database
@@ -64,6 +100,12 @@ func (a *Article) GetByID(ctx context.Context, id string) (found bool, err error
 	}
 
 	err = a.Collection().FindOne(ctx, bson.M{"_id": objectID}).Decode(a)
+	return a.IsFoundFromError(err), err
+}
+
+// GetByID read from database
+func (a *Article) GetByObjectID(ctx context.Context, id primitive.ObjectID) (found bool, err error) {
+	err = a.Collection().FindOne(ctx, bson.M{"_id": id}).Decode(a)
 	return a.IsFoundFromError(err), err
 }
 

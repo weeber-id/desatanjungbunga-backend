@@ -62,6 +62,11 @@ func (a *Admin) GetByID(ctx context.Context, id string) (found bool, err error) 
 	return a.IsFoundFromError(err), err
 }
 
+func (a *Admin) GetByObjectID(ctx context.Context, id primitive.ObjectID) (found bool, err error) {
+	err = a.Collection().FindOne(ctx, bson.M{"_id": id}).Decode(a)
+	return a.IsFoundFromError(err), err
+}
+
 // Create new admin account
 func (a *Admin) Create(ctx context.Context) error {
 	a.CreatedAt = time.Now()

@@ -2,6 +2,7 @@ package article
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
@@ -11,6 +12,7 @@ import (
 // GetOne article controller
 func GetOne(c *gin.Context) {
 	var (
+		wg      sync.WaitGroup
 		request struct {
 			ID   *string `form:"id"`
 			Slug *string `form:"slug"`
@@ -38,6 +40,17 @@ func GetOne(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusNotFound, response.ErrorDataNotFound())
 		return
 	}
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		article.WithAuthor(c)
+	}()
+	go func() {
+		defer wg.Done()
+		article.WithRelated(c)
+	}()
+	wg.Wait()
 
 	c.JSON(http.StatusOK, response.SuccessData(article))
 }
