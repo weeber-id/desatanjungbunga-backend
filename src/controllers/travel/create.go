@@ -2,6 +2,7 @@ package travel
 
 import (
 	"net/http"
+	"sync"
 
 	"github.com/gin-gonic/gin"
 	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
@@ -11,6 +12,7 @@ import (
 // Create controller
 func Create(c *gin.Context) {
 	var (
+		wg       sync.WaitGroup
 		request  requestCreateUpdateTravel
 		response models.Response
 	)
@@ -29,6 +31,17 @@ func Create(c *gin.Context) {
 		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
 		return
 	}
+
+	wg.Add(2)
+	go func() {
+		defer wg.Done()
+		travel.WithCulinaryDetails(c)
+	}()
+	go func() {
+		defer wg.Done()
+		travel.WithLodgingDetails(c)
+	}()
+	wg.Wait()
 
 	c.JSON(http.StatusCreated, response.SuccessDataCreated(travel))
 }

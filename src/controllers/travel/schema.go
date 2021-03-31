@@ -3,12 +3,14 @@ package travel
 import "github.com/weeber-id/desatanjungbunga-backend/src/models"
 
 type requestCreateUpdateTravel struct {
-	Name             string                      `json:"name" binding:"required"`
-	Image            string                      `json:"image" binding:"required"`
-	Price            string                      `json:"price" binding:"required"`
-	OperationTime    models.RequestOperationTime `json:"operation_time" binding:"required"`
-	ShortDescription string                      `json:"short_description" binding:"required"`
-	Description      string                      `json:"description" binding:"required"`
+	Name               string                      `json:"name" binding:"required"`
+	Image              string                      `json:"image" binding:"required"`
+	Price              string                      `json:"price" binding:"required"`
+	OperationTime      models.RequestOperationTime `json:"operation_time" binding:"required"`
+	ShortDescription   string                      `json:"short_description" binding:"required"`
+	Description        string                      `json:"description" binding:"required"`
+	RelatedCulinaryIDs []string                    `json:"related_culinary_ids"`
+	RelatedLodgingIDs  []string                    `json:"related_lodging_ids"`
 }
 
 func (r *requestCreateUpdateTravel) WriteToModel(in *models.Travel) {
@@ -17,6 +19,12 @@ func (r *requestCreateUpdateTravel) WriteToModel(in *models.Travel) {
 	in.Price = r.Price
 	in.ShortDescription = r.ShortDescription
 	in.Description = r.Description
+
+	in.ResetRelatedCulinaryIDs()
+	in.SetRelatedCulinaryIDs(r.RelatedCulinaryIDs)
+
+	in.ResetRelatedLodgingIDs()
+	in.SetRelatedLodgingIDs(r.RelatedLodgingIDs)
 
 	in.OperationTime.Monday.Open = *r.OperationTime.Monday.Open
 	in.OperationTime.Monday.From = r.OperationTime.Monday.From

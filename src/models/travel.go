@@ -58,17 +58,71 @@ type Travel struct {
 			To   string `bson:"to" json:"to"`
 		} `bson:"sunday" json:"sunday"`
 	} `bson:"operation_time" json:"operation_time"`
-	ShortDescription string `bson:"short_description" json:"short_description"`
-	Description      string `bson:"description" json:"description"`
-	Active           bool   `bson:"active" json:"active"`
-	Recommendation   bool   `bson:"recommendation" json:"recommendation"`
+	ShortDescription   string               `bson:"short_description" json:"short_description"`
+	Description        string               `bson:"description" json:"description"`
+	Active             bool                 `bson:"active" json:"active"`
+	Recommendation     bool                 `bson:"recommendation" json:"recommendation"`
+	AuthorID           primitive.ObjectID   `bson:"author_id" json:"-"`
+	RelatedLodgingIDs  []primitive.ObjectID `bson:"related_lodging_ids" json:"-"`
+	RelatedCulinaryIDs []primitive.ObjectID `bson:"related_culinary_ids" json:"-"`
 
-	AuthorID primitive.ObjectID `bson:"author_id" json:"-"`
+	LodgingDetails  []*Lodging  `bson:"-" json:"lodging_details"`
+	CulinaryDetails []*Culinary `bson:"-" json:"culinary_details"`
 }
 
 // Collection pointer to this model
 func (Travel) Collection() *mongo.Collection {
 	return services.DB.Collection(variables.Collection.Travel)
+}
+
+func (w *Travel) ResetRelatedLodgingIDs() {
+	w.RelatedLodgingIDs = nil
+}
+
+func (w *Travel) ResetRelatedCulinaryIDs() {
+	w.RelatedCulinaryIDs = nil
+}
+
+func (w *Travel) SetRelatedLodgingIDs(ids []string) {
+	for _, row := range ids {
+		objectID, err := primitive.ObjectIDFromHex(row)
+		if err != nil {
+			continue
+		}
+		w.RelatedLodgingIDs = append(w.RelatedLodgingIDs, objectID)
+	}
+}
+
+func (w *Travel) SetRelatedCulinaryIDs(ids []string) {
+	for _, row := range ids {
+		objectID, err := primitive.ObjectIDFromHex(row)
+		if err != nil {
+			continue
+		}
+		w.RelatedCulinaryIDs = append(w.RelatedCulinaryIDs, objectID)
+	}
+}
+
+func (w *Travel) WithLodgingDetails(ctx context.Context) {
+	for _, id := range w.RelatedLodgingIDs {
+		lodging := new(Lodging)
+		found, _ := lodging.GetByObjectID(ctx, id)
+		if !found {
+			continue
+		}
+		w.LodgingDetails = append(w.LodgingDetails, lodging)
+	}
+}
+
+func (w *Travel) WithCulinaryDetails(ctx context.Context) {
+	for _, id := range w.RelatedCulinaryIDs {
+		culinary := new(Culinary)
+		found, _ := culinary.GetByObjectID(ctx, id)
+		if !found {
+			continue
+		}
+		w.CulinaryDetails = append(w.CulinaryDetails, culinary)
+	}
 }
 
 // Create new wisata to database
