@@ -93,6 +93,11 @@ func (w *Travel) Create(ctx context.Context, author *Admin) error {
 	return nil
 }
 
+func (w *Travel) GetByObjectID(ctx context.Context, objectID primitive.ObjectID) (found bool, err error) {
+	err = w.Collection().FindOne(ctx, bson.M{"_id": objectID}).Decode(w)
+	return w.IsFoundFromError(err), err
+}
+
 // GetByID read from database
 func (w *Travel) GetByID(ctx context.Context, id string) (found bool, err error) {
 	objectID, err := primitive.ObjectIDFromHex(id)

@@ -101,6 +101,11 @@ func (k *Culinary) Create(ctx context.Context, author *Admin) error {
 	return nil
 }
 
+func (k *Culinary) GetByObjectID(ctx context.Context, objectID primitive.ObjectID) (found bool, err error) {
+	err = k.Collection().FindOne(ctx, bson.M{"_id": objectID}).Decode(k)
+	return k.IsFoundFromError(err), err
+}
+
 // GetByID read from database
 func (k *Culinary) GetByID(ctx context.Context, id string) (found bool, err error) {
 	objectID, err := primitive.ObjectIDFromHex(id)

@@ -17,20 +17,29 @@ import (
 type Article struct {
 	BaseContent `bson:",inline"`
 
-	Title          string               `bson:"title" json:"title"`
-	ImageCover     string               `bson:"image_cover" json:"image_cover"`
-	Author         string               `bson:"author" json:"author"`
-	Body           string               `bson:"body" json:"body"`
-	Slug           string               `bson:"slug" json:"slug"`
-	Active         bool                 `bson:"active" json:"active"`
-	Recommendation bool                 `bson:"recommendation" json:"recommendation"`
-	AuthorID       primitive.ObjectID   `bson:"author_id" json:"-"`
-	RelatedIDs     []primitive.ObjectID `bson:"related_ids" json:"-"`
+	Title          string             `bson:"title" json:"title"`
+	ImageCover     string             `bson:"image_cover" json:"image_cover"`
+	Author         string             `bson:"author" json:"author"`
+	Body           string             `bson:"body" json:"body"`
+	Slug           string             `bson:"slug" json:"slug"`
+	Active         bool               `bson:"active" json:"active"`
+	Recommendation bool               `bson:"recommendation" json:"recommendation"`
+	AuthorID       primitive.ObjectID `bson:"author_id" json:"-"`
+	Relateds       []struct {
+		Source string             `bson:"source"`
+		ID     primitive.ObjectID `bson:"id"`
+	} `bson:"relateds" json:"-"`
 
-	AuthorDetail *Admin `bson:"-" json:"author_detail,omitempty"`
+	AuthorDetail   *Admin `bson:"-" json:"author_detail,omitempty"`
+	RelatedDetails []struct {
+		Source     string `json:"source"`
+		ID         string `json:"id"`
+		Title      string `json:"title"`
+		ImageCover string `json:"image_cover"`
+	} `bson:"-" json:"related_details"`
 
-	RelatedIDsString []string   `bson:"-" json:"related_id"`
-	RelatedDetails   []*Article `bson:"-" json:"related_details,omitempty"`
+	RelatedIDsString []string `bson:"-" json:"related_id"`
+	// RelatedDetails   []*Article `bson:"-" json:"related_details,omitempty"`
 }
 
 // Collection pointer to this model
@@ -45,28 +54,92 @@ func (a *Article) WithAuthor(ctx context.Context) {
 }
 
 func (a *Article) WithRelated(ctx context.Context) {
-	for _, id := range a.RelatedIDs {
-		article := new(Article)
-		found, _ := article.GetByObjectID(ctx, id)
-		if !found {
+	for _, related := range a.Relateds {
+		row := struct {
+			Source     string `json:"source"`
+			ID         string `json:"id"`
+			Title      string `json:"title"`
+			ImageCover string `json:"image_cover"`
+		}{
+			Source: related.Source,
+			ID:     related.ID.Hex(),
+		}
+
+		// Reading detail, if not found then continue
+		switch related.Source {
+		case variables.Collection.Article:
+			article := new(Article)
+			found, _ := article.GetByObjectID(ctx, related.ID)
+			if !found {
+				continue
+			}
+			row.Title = article.Title
+			row.ImageCover = article.ImageCover
+
+		case variables.Collection.Culinary:
+			culinary := new(Culinary)
+			found, _ := culinary.GetByObjectID(ctx, related.ID)
+			if !found {
+				continue
+			}
+			row.Title = culinary.Name
+			row.ImageCover = culinary.Image
+
+		case variables.Collection.Handcraft:
+			handcraft := new(Handcraft)
+			found, _ := handcraft.GetByObjectID(ctx, related.ID)
+			if !found {
+				continue
+			}
+			row.Title = handcraft.Name
+			row.ImageCover = handcraft.Image
+
+		case variables.Collection.Lodging:
+			lodging := new(Lodging)
+			found, _ := lodging.GetByObjectID(ctx, related.ID)
+			if !found {
+				continue
+			}
+			row.Title = lodging.Name
+			row.ImageCover = lodging.Image
+
+		case variables.Collection.Travel:
+			travel := new(Travel)
+			found, _ := travel.GetByObjectID(ctx, related.ID)
+			if !found {
+				continue
+			}
+			row.Title = travel.Name
+			row.ImageCover = travel.Image
+
+		default:
 			continue
 		}
-		a.RelatedDetails = append(a.RelatedDetails, article)
+
+		// apppend result
+		a.RelatedDetails = append(a.RelatedDetails, row)
 	}
 }
 
-func (a *Article) SetRelatedIDs(ids []string) {
-	a.RelatedIDsString = ids
+func (a *Article) ResetRelateds() {
+	a.Relateds = nil
+}
 
-	objectIDs := []primitive.ObjectID{}
-	for _, row := range ids {
-		objectID, err := primitive.ObjectIDFromHex(row)
-		if err != nil {
-			continue
-		}
-		objectIDs = append(objectIDs, objectID)
+func (a *Article) SetRelatedRow(source string, id string) {
+	var row struct {
+		Source string             `bson:"source"`
+		ID     primitive.ObjectID `bson:"id"`
 	}
-	a.RelatedIDs = objectIDs
+
+	objectID, err := primitive.ObjectIDFromHex(id)
+	if err != nil {
+		return
+	}
+
+	row.ID = objectID
+	row.Source = source
+
+	a.Relateds = append(a.Relateds, row)
 }
 
 // Create new article to database

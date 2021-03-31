@@ -11,7 +11,7 @@ import (
 func Delete(c *gin.Context) {
 	var (
 		requestQuery struct {
-			ID string `form:"id" binding:"required"`
+			ID *string `form:"id" bindind:"required"`
 		}
 		response models.Response
 	)
@@ -22,7 +22,7 @@ func Delete(c *gin.Context) {
 	}
 
 	article := new(models.Article)
-	found, _ := article.GetByID(c, requestQuery.ID)
+	found, _ := article.GetByID(c, *requestQuery.ID)
 	if !found {
 		c.AbortWithStatusJSON(http.StatusNotFound, response.ErrorDataNotFound())
 		return

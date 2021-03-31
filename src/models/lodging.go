@@ -104,6 +104,11 @@ func (l *Lodging) Create(ctx context.Context, author *Admin) error {
 	return nil
 }
 
+func (l *Lodging) GetByObjectID(ctx context.Context, objectID primitive.ObjectID) (found bool, err error) {
+	err = l.Collection().FindOne(ctx, bson.M{"_id": objectID}).Decode(l)
+	return l.IsFoundFromError(err), err
+}
+
 // GetByID read from database
 func (l *Lodging) GetByID(ctx context.Context, id string) (found bool, err error) {
 	objectID, err := primitive.ObjectIDFromHex(id)

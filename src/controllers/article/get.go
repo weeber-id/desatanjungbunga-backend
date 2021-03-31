@@ -20,7 +20,11 @@ func GetOne(c *gin.Context) {
 		response models.Response
 	)
 
-	c.BindQuery(&request)
+	if err := c.BindQuery(&request); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
 	if request.ID == nil && request.Slug == nil {
 		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorBadRequest("id atau slug harus diisi"))
 		return

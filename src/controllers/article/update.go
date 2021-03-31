@@ -15,10 +15,13 @@ func Update(c *gin.Context) {
 			ID string `form:"id" binding:"required"`
 		}
 		requestBody struct {
-			Title      string   `json:"title" binding:"required"`
-			ImageCover string   `json:"image_cover" binding:"required"`
-			Body       string   `json:"body" binding:"required"`
-			RelatedIDs []string `json:"related_id"`
+			Title      string `json:"title" binding:"required"`
+			ImageCover string `json:"image_cover" binding:"required"`
+			Body       string `json:"body" binding:"required"`
+			Relateds   []struct {
+				Source string `json:"source"`
+				ID     string `json:"id"`
+			} `json:"relateds"`
 		}
 		response models.Response
 	)
@@ -42,12 +45,16 @@ func Update(c *gin.Context) {
 	article.Title = requestBody.Title
 	article.ImageCover = requestBody.ImageCover
 	article.Body = requestBody.Body
-	article.SetRelatedIDs(requestBody.RelatedIDs)
+	article.ResetRelateds()
+	for _, related := range requestBody.Relateds {
+		article.SetRelatedRow(related.Source, related.ID)
+	}
 
 	if err := article.Update(c); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
 		return
 	}
+	article.WithRelated(c)
 
 	c.JSON(http.StatusOK, response.SuccessData(article))
 

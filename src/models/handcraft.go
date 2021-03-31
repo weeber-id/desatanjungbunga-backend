@@ -97,6 +97,11 @@ func (b *Handcraft) Create(ctx context.Context, author *Admin) error {
 	return nil
 }
 
+func (b *Handcraft) GetByObjectID(ctx context.Context, objectID primitive.ObjectID) (found bool, err error) {
+	err = b.Collection().FindOne(ctx, bson.M{"_id": objectID}).Decode(b)
+	return b.IsFoundFromError(err), err
+}
+
 // GetByID read from database
 func (b *Handcraft) GetByID(ctx context.Context, id string) (found bool, err error) {
 	objectID, err := primitive.ObjectIDFromHex(id)
