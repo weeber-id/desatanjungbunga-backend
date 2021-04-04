@@ -99,6 +99,7 @@ func main() {
 
 			admin.GET("/article", article.GetOne)
 			admin.GET("/articles", article.GetMultiple)
+			admin.GET("/article/list-contents-related", article.GetSearchInline)
 			admin.POST("/article/create", article.Create)
 			admin.POST("/article/update", article.Update)
 			admin.POST("/article/update/active", article.ChangeActiveDeactive)

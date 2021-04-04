@@ -34,12 +34,10 @@ type Article struct {
 	RelatedDetails []struct {
 		Source     string `json:"source"`
 		ID         string `json:"id"`
+		Slug       string `json:"slug"`
 		Title      string `json:"title"`
 		ImageCover string `json:"image_cover"`
 	} `bson:"-" json:"related_details"`
-
-	RelatedIDsString []string `bson:"-" json:"related_id"`
-	// RelatedDetails   []*Article `bson:"-" json:"related_details,omitempty"`
 }
 
 // Collection pointer to this model
@@ -58,6 +56,7 @@ func (a *Article) WithRelated(ctx context.Context) {
 		row := struct {
 			Source     string `json:"source"`
 			ID         string `json:"id"`
+			Slug       string `json:"slug"`
 			Title      string `json:"title"`
 			ImageCover string `json:"image_cover"`
 		}{
@@ -74,6 +73,7 @@ func (a *Article) WithRelated(ctx context.Context) {
 				continue
 			}
 			row.Title = article.Title
+			row.Slug = article.Slug
 			row.ImageCover = article.ImageCover
 
 		case variables.Collection.Culinary:
@@ -83,6 +83,7 @@ func (a *Article) WithRelated(ctx context.Context) {
 				continue
 			}
 			row.Title = culinary.Name
+			row.Slug = culinary.Slug
 			row.ImageCover = culinary.Image
 
 		case variables.Collection.Handcraft:
@@ -92,6 +93,7 @@ func (a *Article) WithRelated(ctx context.Context) {
 				continue
 			}
 			row.Title = handcraft.Name
+			row.Slug = handcraft.Slug
 			row.ImageCover = handcraft.Image
 
 		case variables.Collection.Lodging:
@@ -101,6 +103,7 @@ func (a *Article) WithRelated(ctx context.Context) {
 				continue
 			}
 			row.Title = lodging.Name
+			row.Slug = lodging.Slug
 			row.ImageCover = lodging.Image
 
 		case variables.Collection.Travel:
@@ -110,6 +113,7 @@ func (a *Article) WithRelated(ctx context.Context) {
 				continue
 			}
 			row.Title = travel.Name
+			row.Slug = travel.Slug
 			row.ImageCover = travel.Image
 
 		default:
