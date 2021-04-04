@@ -10,6 +10,105 @@ import (
 	"github.com/weeber-id/desatanjungbunga-backend/src/variables"
 )
 
+// AdminUpdateSellerAccount super admin update seller account
+func AdminUpdateSellerAccount(c *gin.Context) {
+	var (
+		requestQuery struct {
+			UserID string `form:"user_id" binding:"required"`
+		}
+		requestBody struct {
+			Name                string `json:"name" binding:"required"`
+			Address             string `json:"address" binding:"required"`
+			DateofBirth         string `json:"date_of_birth" binding:"required"`
+			PhoneNumberWhatsapp string `json:"phone_number_whatsapp" binding:"required"`
+			Email               string `json:"email" binding:"required"`
+			ProfilePicture      string `json:"profile_picture"`
+		}
+		response models.Response
+	)
+
+	if err := c.BindQuery(&requestQuery); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// ====================== Check role =========================
+	claims := middlewares.GetClaims(c)
+	if claims.Role != 0 {
+		c.AbortWithStatusJSON(http.StatusForbidden, response.ErrorForbidden())
+		return
+	}
+
+	admin := new(models.Admin)
+	found, _ := admin.GetByID(c, requestQuery.UserID)
+	if !found {
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorDataNotFound())
+		return
+	}
+
+	// ================= Create new admin account ================
+	admin.Name = requestBody.Name
+	admin.Email = requestBody.Email
+	admin.Address = requestBody.Address
+	admin.DateofBirth = requestBody.DateofBirth
+	admin.PhoneNumberWhatsapp = requestBody.PhoneNumberWhatsapp
+	admin.ProfilePicture = requestBody.ProfilePicture
+
+	if err := admin.Update(c); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.SuccessDataCreated(admin))
+}
+
+func AdminUpdate(c *gin.Context) {
+	var (
+		requestBody struct {
+			Name                string `json:"name" binding:"required"`
+			Address             string `json:"address" binding:"required"`
+			DateofBirth         string `json:"date_of_birth" binding:"required"`
+			PhoneNumberWhatsapp string `json:"phone_number_whatsapp" binding:"required"`
+			Email               string `json:"email" binding:"required"`
+			ProfilePicture      string `json:"profile_picture"`
+		}
+		response models.Response
+	)
+
+	if err := c.BindJSON(&requestBody); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	claims := middlewares.GetClaims(c)
+
+	admin := new(models.Admin)
+	found, _ := admin.GetByID(c, claims.ID)
+	if !found {
+		c.AbortWithStatusJSON(http.StatusBadRequest, response.ErrorDataNotFound())
+		return
+	}
+
+	// ================= Create new admin account ================
+	admin.Name = requestBody.Name
+	admin.Email = requestBody.Email
+	admin.Address = requestBody.Address
+	admin.DateofBirth = requestBody.DateofBirth
+	admin.PhoneNumberWhatsapp = requestBody.PhoneNumberWhatsapp
+	admin.ProfilePicture = requestBody.ProfilePicture
+
+	if err := admin.Update(c); err != nil {
+		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	c.JSON(http.StatusCreated, response.SuccessDataCreated(admin))
+}
+
 // AdminChangePassword controller
 func AdminChangePassword(c *gin.Context) {
 	var (

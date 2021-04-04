@@ -21,11 +21,15 @@ const (
 type Admin struct {
 	BaseContent `bson:",inline"`
 
-	Name           string `bson:"name" json:"name"`
-	Username       string `bson:"username" json:"username"`
-	Password       string `bson:"password" json:"-"`
-	Role           int    `bson:"role" json:"role"`
-	ProfilePicture string `bson:"profile_picture" json:"profile_picture"`
+	Name                string `bson:"name" json:"name"`
+	Email               string `bson:"email" json:"email"`
+	Address             string `bson:"address" json:"address"`
+	DateofBirth         string `bson:"date_of_birth" json:"date_of_birth"`
+	PhoneNumberWhatsapp string `bson:"phone_number_whatsapp" json:"phone_number_whatsapp"`
+	Username            string `bson:"username" json:"username"`
+	Password            string `bson:"password" json:"-"`
+	Role                int    `bson:"role" json:"role"`
+	ProfilePicture      string `bson:"profile_picture" json:"profile_picture"`
 }
 
 // Collection pointer to this model

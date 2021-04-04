@@ -12,7 +12,7 @@ import (
 func AdminDelete(c *gin.Context) {
 	var (
 		request struct {
-			Username string `json:"name" binding:"required"`
+			Username string `form:"username" binding:"required"`
 		}
 		response models.Response
 	)
