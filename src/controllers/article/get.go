@@ -131,7 +131,7 @@ func GetSearchInline(c *gin.Context) {
 	var (
 		wg      sync.WaitGroup
 		request struct {
-			Search         string  `form:"search" binding:"required"`
+			Search         *string `form:"search"`
 			SortTitle      *string `form:"sort_title"`
 			SortDate       *string `form:"sort_date"`
 			Page           *int    `form:"page"`
@@ -154,11 +154,13 @@ func GetSearchInline(c *gin.Context) {
 	lodgings := new(models.MultipleLodging)
 	travels := new(models.MultipleWisata)
 
-	articles.FilterBySearch(request.Search)
-	culinaries.FilterBySearch(request.Search)
-	handcrafts.FilterBySearch(request.Search)
-	lodgings.FilterBySearch(request.Search)
-	travels.FilterBySearch(request.Search)
+	if request.Search != nil {
+		articles.FilterBySearch(*request.Search)
+		culinaries.FilterBySearch(*request.Search)
+		handcrafts.FilterBySearch(*request.Search)
+		lodgings.FilterBySearch(*request.Search)
+		travels.FilterBySearch(*request.Search)
+	}
 
 	if request.SortTitle != nil {
 		articles.SortByTitle(*request.SortTitle)

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math/rand"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -26,6 +27,8 @@ import (
 )
 
 func main() {
+	rand.Seed(time.Now().UnixNano())
+
 	// Environment section
 	godotenv.Load("./devel.env")
 	variables.InitializationVariable()
@@ -84,6 +87,7 @@ func main() {
 			admin.GET("/register/check-username", account.AdminCheckUsernameIsExists)
 			admin.POST("/delete", account.AdminDelete)
 			admin.POST("/update/account/seller", account.AdminUpdateSellerAccount)
+			// admin.POST("/update/account/seller/reset-password", account.AdminUpdateSellerResetPassword)
 			admin.POST("/update", account.AdminUpdate)
 			admin.POST("/update/password", account.AdminChangePassword)
 			admin.POST("/update/profile-picture", account.AdminChangeProfilePicture)

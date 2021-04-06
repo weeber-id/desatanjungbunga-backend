@@ -1,12 +1,15 @@
 package account
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
 	"github.com/weeber-id/desatanjungbunga-backend/src/models"
+	"github.com/weeber-id/desatanjungbunga-backend/src/services"
 	"github.com/weeber-id/desatanjungbunga-backend/src/storages"
+	"github.com/weeber-id/desatanjungbunga-backend/src/tools"
 	"github.com/weeber-id/desatanjungbunga-backend/src/variables"
 )
 
@@ -65,6 +68,62 @@ func AdminUpdateSellerAccount(c *gin.Context) {
 
 	c.JSON(http.StatusCreated, response.SuccessDataCreated(admin))
 }
+
+// ========================================================================================
+
+func AdminUpdateSellerResetPassword(c *gin.Context) {
+	var (
+		requestQuery struct {
+			UserID string `form:"user_id" binding:"required"`
+		}
+		response models.Response
+	)
+
+	if err := c.BindQuery(&requestQuery); err != nil {
+		c.AbortWithStatusJSON(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	// Check role, only super admin to seller
+	claims := middlewares.GetClaims(c)
+	if claims.Role != 0 {
+		c.AbortWithStatusJSON(http.StatusForbidden, response.ErrorForbidden())
+		return
+	}
+
+	// find target seller
+	seller := new(models.Admin)
+	found, _ := seller.GetByID(c, requestQuery.UserID)
+	if !found {
+		c.AbortWithStatusJSON(http.StatusNotFound, response.ErrorDataNotFound())
+		return
+	}
+	if seller.Role == 0 {
+		c.AbortWithStatusJSON(http.StatusForbidden, response.ErrorForbidden())
+		return
+	}
+
+	// Generate new password
+	newPassword := tools.RandStringRunes(10)
+
+	// Send generated password through email
+	email := services.Email{To: seller.Email}
+	if err := email.SendNewPasswordForReset(seller.Name, seller.Username, newPassword); err != nil {
+		c.AbortWithStatusJSON(http.StatusServiceUnavailable, response.ErrorBadRequest(fmt.Sprintf("error in email smtp: %s", err.Error())))
+		return
+	}
+
+	// Update seller account with new password
+	seller.SetPassword(newPassword)
+	if err := seller.Update(c); err != nil {
+		c.AbortWithStatusJSON(http.StatusInternalServerError, response.ErrorInternalServer(err))
+		return
+	}
+
+	c.JSON(http.StatusOK, response.SuccessData(nil))
+}
+
+// ========================================================================================
 
 func AdminUpdate(c *gin.Context) {
 	var (

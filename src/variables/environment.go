@@ -35,6 +35,12 @@ var MinioConfig struct {
 	SecretKey   string
 }
 
+// GmailConfig for binadesa email
+var GmailConfig struct {
+	Email    string
+	Password string
+}
+
 // JWTConfig datatype
 var JWTConfig struct {
 	Key string
@@ -61,6 +67,9 @@ func InitializationVariable() {
 		log.Fatalf("read version file %v \n", err)
 	}
 	Version = string(ver)
+
+	GmailConfig.Email = os.Getenv("GMAIL_MAIL")
+	GmailConfig.Password = os.Getenv("GMAIL_PASS")
 
 	MongoConfig.Host = os.Getenv("MONGO_HOST")
 	MongoConfig.User = os.Getenv("MONGO_USER")
