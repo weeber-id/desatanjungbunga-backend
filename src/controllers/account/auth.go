@@ -31,7 +31,7 @@ func AdminLogin(c *gin.Context) {
 	}
 
 	if !admin.IsPasswordMatch(request.Password) {
-		c.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorDataNotFound())
+		c.AbortWithStatusJSON(http.StatusUnauthorized, response.ErrorForbidden())
 		return
 	}
 

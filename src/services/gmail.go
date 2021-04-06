@@ -44,7 +44,7 @@ func (e *Email) Send() error {
 // SendNewPasswordForReset via email
 func (e *Email) SendNewPasswordForReset(name, username, password string) error {
 	e.Subject = "Pemberitahuan Kantor Desa TanjungBunga - Reset Password"
-	e.Body = fmt.Sprintf("Halo %s, Akun anda telah direset oleh super admin. Silahkan login kembali dengan menggunakan \n\nUsername: %s\n\nPassword: %s\n\n", name, username, password)
+	e.Body = fmt.Sprintf("Halo %s, Akun anda telah direset oleh super admin. Silahkan login kembali dengan menggunakan \n\nUsername: %s\nPassword: %s\n\n", name, username, password)
 
 	return e.Send()
 }
