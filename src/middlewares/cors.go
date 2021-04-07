@@ -14,9 +14,9 @@ func CORS() gin.HandlerFunc {
 			"https://localhost:3000",
 			"https://web-localhost.weeber.id:3000",
 			"https://staging-tanjungbunga.weeber.id",
-			"https://tanjungbunga.id",
-			"https://www.tanjungbunga.id",
-			"https://admin.tanjungbunga.id":
+			"https://wisata-samosir.com",
+			"https://www.wisata-samosir.com",
+			"https://admin.wisata-samosir.com":
 
 			c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
 		}
