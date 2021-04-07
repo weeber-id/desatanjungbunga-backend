@@ -110,7 +110,7 @@ func InitializationVariable() {
 
 	case "production":
 		MongoConfig.Connector = "mongodb+srv"
-		JWTConfig.Domain = "tanjungbunga.id"
+		JWTConfig.Domain = "wisata-samosir.com"
 		JWTConfig.Path = "/"
 		JWTConfig.HTTPS = true
 		JWTConfig.SameSite = http.SameSiteNoneMode
