@@ -77,8 +77,12 @@ func GetMultiple(c *gin.Context) {
 		return
 	}
 
-	claims := middlewares.GetClaims(c)
 	multiTravel := new(models.MultipleWisata)
+
+	claims := middlewares.GetClaims(c)
+	if claims.ID == "" {
+		multiTravel.FilterOnlyActive()
+	}
 
 	if request.Search != nil {
 		multiTravel.FilterBySearch(*request.Search)
@@ -86,11 +90,14 @@ func GetMultiple(c *gin.Context) {
 	if claims.Role != 0 {
 		multiTravel.FilterByAuthorID(claims.ID)
 	}
+	multiTravel.SortByRecommendation()
 	if request.SortName != nil {
 		multiTravel.SortByName(*request.SortName)
 	}
 	if request.SortDate != nil {
 		multiTravel.SortByDate(*request.SortDate)
+	} else {
+		multiTravel.SortByDate("desc")
 	}
 	if request.Page != nil && request.ContentPerPage != nil {
 		multiTravel.FilterByPaginate(*request.Page, *request.ContentPerPage)

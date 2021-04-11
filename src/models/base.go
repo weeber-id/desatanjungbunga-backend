@@ -59,12 +59,30 @@ func (baseList) getDirectionFromStringToInt(direction string) int {
 	return numDirection
 }
 
+// SortByRecommendation
+func (l *baseList) SortByRecommendation() {
+	l.aggregate = append(l.aggregate, bson.M{
+		"$sort": bson.M{"recommendation": -1},
+	})
+}
+
 // SortByDate asc (oldest) or desc (latest)
 func (l *baseList) SortByDate(direction string) {
 	numDirection := l.getDirectionFromStringToInt(direction)
 	l.aggregate = append(l.aggregate, bson.M{
 		"$sort": bson.M{"updated_at": numDirection},
 	})
+}
+
+func (l *baseList) FilterOnlyActive() {
+	searchAggregate := []bson.M{
+		{
+			"$match": bson.M{"active": true},
+		},
+	}
+
+	l.aggregate = append(l.aggregate, searchAggregate...)
+	l.aggregateSearch = append(l.aggregateSearch, searchAggregate...)
 }
 
 func (l *baseList) FilterBySearch(keyword string) {

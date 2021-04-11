@@ -44,7 +44,15 @@ func (e *Email) Send() error {
 // SendNewPasswordForReset via email
 func (e *Email) SendNewPasswordForReset(name, username, password string) error {
 	e.Subject = "Pemberitahuan Kantor Desa TanjungBunga - Reset Password"
-	e.Body = fmt.Sprintf("Halo %s, Akun anda telah direset oleh super admin. Silahkan login kembali dengan menggunakan \n\nUsername: %s\nPassword: %s\n\n", name, username, password)
+	e.Body = fmt.Sprintf("Halo %s, Akun anda telah direset password oleh super admin. Silahkan login kembali dengan menggunakan \n\nUsername: %s\nPassword: %s\n\n", name, username, password)
+
+	return e.Send()
+}
+
+// SendWelcomeAccount via email
+func (e *Email) SendWelcomeAccount(name, username, password string) error {
+	e.Subject = "Wisata-Samosir.com oleh Desa Tanjung Bunga - Akun Pengguna Baru"
+	e.Body = fmt.Sprintf("Halo %s! Selamat menjadi bagian dari admin website WIsata-Samosir.com. Berikut adalah username dan password anda:\n\nUsername: %s \npassword: %s \n\nTips: Sebaiknya mohon untuk mengganti password baru saat sudah login ya, terima kasih.", name, username, password)
 
 	return e.Send()
 }

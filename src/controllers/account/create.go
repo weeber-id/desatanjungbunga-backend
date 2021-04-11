@@ -1,11 +1,13 @@
 package account
 
 import (
+	"fmt"
 	"net/http"
 
 	"github.com/gin-gonic/gin"
 	"github.com/weeber-id/desatanjungbunga-backend/src/middlewares"
 	"github.com/weeber-id/desatanjungbunga-backend/src/models"
+	"github.com/weeber-id/desatanjungbunga-backend/src/services"
 )
 
 func AdminCheckUsernameIsExists(c *gin.Context) {
@@ -39,15 +41,15 @@ func AdminCheckUsernameIsExists(c *gin.Context) {
 func AdminCreate(c *gin.Context) {
 	var (
 		request struct {
-			Name                string `json:"name" binding:"required"`
-			Email               string `json:"email" binding:"required"`
-			Address             string `json:"address" binding:"required"`
-			DateofBirth         string `json:"date_of_birth" binding:"required"`
-			PhoneNumberWhatsapp string `json:"phone_number_whatsapp" binding:"required"`
-			Username            string `json:"username" binding:"required"`
-			Password            string `json:"password" binding:"required"`
-			Role                int    `json:"role" binding:"required"`
-			ProfilePicture      string `json:"profile_picture" binding:"required"`
+			Name                string `json:"name"`
+			Email               string `json:"email"`
+			Address             string `json:"address"`
+			DateofBirth         string `json:"date_of_birth"`
+			PhoneNumberWhatsapp string `json:"phone_number_whatsapp"`
+			Username            string `json:"username"`
+			Password            string `json:"password"`
+			Role                int    `json:"role"`
+			ProfilePicture      string `json:"profile_picture"`
 		}
 		response models.Response
 	)
@@ -87,6 +89,13 @@ func AdminCreate(c *gin.Context) {
 
 	if err := newAdmin.Create(c); err != nil {
 		c.AbortWithError(http.StatusInternalServerError, err)
+		return
+	}
+
+	// Send welcome email through email
+	email := services.Email{To: request.Email}
+	if err := email.SendWelcomeAccount(request.Name, request.Username, request.Password); err != nil {
+		c.AbortWithStatusJSON(http.StatusServiceUnavailable, response.ErrorBadRequest(fmt.Sprintf("error in email smtp: %s", err.Error())))
 		return
 	}
 

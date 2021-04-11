@@ -65,8 +65,12 @@ func GetMultiple(c *gin.Context) {
 		return
 	}
 
-	claims := middlewares.GetClaims(c)
 	lodgings := new(models.MultipleLodging)
+
+	claims := middlewares.GetClaims(c)
+	if claims.ID == "" {
+		lodgings.FilterOnlyActive()
+	}
 
 	if request.Search != nil {
 		lodgings.FilterBySearch(*request.Search)
@@ -74,11 +78,14 @@ func GetMultiple(c *gin.Context) {
 	if claims.Role != 0 {
 		lodgings.FilterByAuthorID(claims.ID)
 	}
+	lodgings.SortByRecommendation()
 	if request.SortName != nil {
 		lodgings.SortByName(*request.SortName)
 	}
 	if request.SortDate != nil {
 		lodgings.SortByDate(*request.SortDate)
+	} else {
+		lodgings.SortByDate("desc")
 	}
 	if request.Page != nil && request.ContentPerPage != nil {
 		lodgings.FilterByPaginate(*request.Page, *request.ContentPerPage)

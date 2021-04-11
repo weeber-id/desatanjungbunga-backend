@@ -20,11 +20,11 @@ func AdminUpdateSellerAccount(c *gin.Context) {
 			UserID string `form:"user_id" binding:"required"`
 		}
 		requestBody struct {
-			Name                string `json:"name" binding:"required"`
-			Address             string `json:"address" binding:"required"`
-			DateofBirth         string `json:"date_of_birth" binding:"required"`
-			PhoneNumberWhatsapp string `json:"phone_number_whatsapp" binding:"required"`
-			Email               string `json:"email" binding:"required"`
+			Name                string `json:"name"`
+			Address             string `json:"address"`
+			DateofBirth         string `json:"date_of_birth"`
+			PhoneNumberWhatsapp string `json:"phone_number_whatsapp"`
+			Email               string `json:"email"`
 			ProfilePicture      string `json:"profile_picture"`
 		}
 		response models.Response
@@ -128,11 +128,11 @@ func AdminUpdateSellerResetPassword(c *gin.Context) {
 func AdminUpdate(c *gin.Context) {
 	var (
 		requestBody struct {
-			Name                string `json:"name" binding:"required"`
-			Address             string `json:"address" binding:"required"`
-			DateofBirth         string `json:"date_of_birth" binding:"required"`
-			PhoneNumberWhatsapp string `json:"phone_number_whatsapp" binding:"required"`
-			Email               string `json:"email" binding:"required"`
+			Name                string `json:"name"`
+			Address             string `json:"address"`
+			DateofBirth         string `json:"date_of_birth"`
+			PhoneNumberWhatsapp string `json:"phone_number_whatsapp"`
+			Email               string `json:"email"`
 			ProfilePicture      string `json:"profile_picture"`
 		}
 		response models.Response

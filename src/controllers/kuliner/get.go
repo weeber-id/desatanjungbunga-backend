@@ -61,8 +61,12 @@ func GetMultiple(c *gin.Context) {
 
 	c.BindQuery(&request)
 
-	claims := middlewares.GetClaims(c)
 	multiKuliner := new(models.MultipleKuliner)
+
+	claims := middlewares.GetClaims(c)
+	if claims.ID == "" {
+		multiKuliner.FilterOnlyActive()
+	}
 
 	if request.Search != nil {
 		multiKuliner.FilterBySearch(*request.Search)
@@ -70,11 +74,14 @@ func GetMultiple(c *gin.Context) {
 	if claims.Role != 0 {
 		multiKuliner.FilterByAuthorID(claims.ID)
 	}
+	multiKuliner.SortByRecommendation()
 	if request.SortName != nil {
 		multiKuliner.SortByName(*request.SortName)
 	}
 	if request.SortDate != nil {
 		multiKuliner.SortByDate(*request.SortDate)
+	} else {
+		multiKuliner.SortByDate("desc")
 	}
 	if request.Page != nil && request.ContentPerPage != nil {
 		multiKuliner.FilterByPaginate(*request.Page, *request.ContentPerPage)

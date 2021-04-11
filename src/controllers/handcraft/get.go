@@ -64,8 +64,12 @@ func GetMultiple(c *gin.Context) {
 		return
 	}
 
-	claims := middlewares.GetClaims(c)
 	multiHandcraft := new(models.MultipleBelanja)
+
+	claims := middlewares.GetClaims(c)
+	if claims.ID == "" {
+		multiHandcraft.FilterOnlyActive()
+	}
 
 	if request.Search != nil {
 		multiHandcraft.FilterBySearch(*request.Search)
@@ -73,11 +77,14 @@ func GetMultiple(c *gin.Context) {
 	if claims.Role != 0 {
 		multiHandcraft.FilterByAuthorID(claims.ID)
 	}
+	multiHandcraft.SortByRecommendation()
 	if request.SortName != nil {
 		multiHandcraft.SortByName(*request.SortName)
 	}
 	if request.SortDate != nil {
 		multiHandcraft.SortByDate(*request.SortDate)
+	} else {
+		multiHandcraft.SortByDate("desc")
 	}
 	if request.Page != nil && request.ContentPerPage != nil {
 		multiHandcraft.FilterByPaginate(*request.Page, *request.ContentPerPage)

@@ -82,8 +82,12 @@ func GetMultiple(c *gin.Context) {
 		return
 	}
 
-	claims := middlewares.GetClaims(c)
 	articles := new(models.Articles)
+
+	claims := middlewares.GetClaims(c)
+	if claims.ID == "" {
+		articles.FilterOnlyActive()
+	}
 
 	if request.Search != nil {
 		articles.FilterBySearch(*request.Search)
@@ -91,11 +95,14 @@ func GetMultiple(c *gin.Context) {
 	if claims.Role != 0 {
 		articles.FilterByAuthorID(claims.ID)
 	}
+	articles.SortByRecommendation()
 	if request.SortTitle != nil {
 		articles.SortByTitle(*request.SortTitle)
 	}
 	if request.SortDate != nil {
 		articles.SortByDate(*request.SortDate)
+	} else {
+		articles.SortByDate("desc")
 	}
 
 	if request.Page != nil && request.ContentPerPage != nil {
