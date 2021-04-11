@@ -168,6 +168,9 @@ func (b *MultipleBelanja) FilterByAuthorID(authorID string) *MultipleBelanja {
 
 // Get multiple belanja from database
 func (b *MultipleBelanja) Get(ctx context.Context) error {
+	b.aggregate = append(b.aggregate, bson.M{
+		"$sort": b.aggregateSort,
+	})
 	cur, err := b.Collection().Aggregate(ctx, b.aggregate)
 	if err != nil {
 		return err

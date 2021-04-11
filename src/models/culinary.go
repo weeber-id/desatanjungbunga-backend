@@ -172,6 +172,9 @@ func (k *MultipleKuliner) FilterByAuthorID(authorID string) *MultipleKuliner {
 
 // Get multiple kuliner from database
 func (k *MultipleKuliner) Get(ctx context.Context) error {
+	k.aggregate = append(k.aggregate, bson.M{
+		"$sort": k.aggregateSort,
+	})
 	cur, err := k.Collection().Aggregate(ctx, k.aggregate)
 	if err != nil {
 		return err

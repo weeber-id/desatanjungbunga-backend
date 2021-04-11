@@ -43,6 +43,7 @@ type baseList struct {
 	aggregate []bson.M
 
 	aggregateSearch []bson.M
+	aggregateSort   bson.D
 	contentPerPage  int
 }
 
@@ -61,16 +62,16 @@ func (baseList) getDirectionFromStringToInt(direction string) int {
 
 // SortByRecommendation
 func (l *baseList) SortByRecommendation() {
-	l.aggregate = append(l.aggregate, bson.M{
-		"$sort": bson.M{"recommendation": -1},
+	l.aggregateSort = append(l.aggregateSort, bson.E{
+		Key: "recommendation", Value: -1,
 	})
 }
 
 // SortByDate asc (oldest) or desc (latest)
 func (l *baseList) SortByDate(direction string) {
 	numDirection := l.getDirectionFromStringToInt(direction)
-	l.aggregate = append(l.aggregate, bson.M{
-		"$sort": bson.M{"updated_at": numDirection},
+	l.aggregateSort = append(l.aggregateSort, bson.E{
+		Key: "updated_at", Value: numDirection,
 	})
 }
 

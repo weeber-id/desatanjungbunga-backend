@@ -241,6 +241,9 @@ func (a *Articles) FilterByAuthorID(authorID string) *Articles {
 
 // Get multiple article from database
 func (a *Articles) Get(ctx context.Context) error {
+	a.aggregate = append(a.aggregate, bson.M{
+		"$sort": a.aggregateSort,
+	})
 	cur, err := a.Collection().Aggregate(ctx, a.aggregate)
 	if err != nil {
 		return err

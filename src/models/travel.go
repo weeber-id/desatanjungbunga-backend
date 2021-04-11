@@ -218,6 +218,9 @@ func (w *MultipleWisata) FilterByAuthorID(authorID string) *MultipleWisata {
 
 // Get multiple wisata from database
 func (w *MultipleWisata) Get(ctx context.Context) error {
+	w.aggregate = append(w.aggregate, bson.M{
+		"$sort": w.aggregateSort,
+	})
 	cur, err := w.Collection().Aggregate(ctx, w.aggregate)
 	if err != nil {
 		return err

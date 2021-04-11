@@ -186,6 +186,9 @@ func (m *MultipleLodging) FilterByAuthorID(authorID string) *MultipleLodging {
 
 // Get multiple lodging from database
 func (m *MultipleLodging) Get(ctx context.Context) error {
+	m.aggregate = append(m.aggregate, bson.M{
+		"$sort": m.aggregateSort,
+	})
 	cur, err := m.Collection().Aggregate(ctx, m.aggregate)
 	if err != nil {
 		return err
