@@ -66,15 +66,15 @@ func GetMultiple(c *gin.Context) {
 	}
 
 	lodgings := new(models.MultipleLodging)
+	if request.Search != nil {
+		lodgings.FilterBySearch(*request.Search)
+	}
 
 	claims := middlewares.GetClaims(c)
 	if claims.ID == "" {
 		lodgings.FilterOnlyActive()
 	}
 
-	if request.Search != nil {
-		lodgings.FilterBySearch(*request.Search)
-	}
 	if claims.Role != 0 {
 		lodgings.FilterByAuthorID(claims.ID)
 	}

@@ -65,15 +65,15 @@ func GetMultiple(c *gin.Context) {
 	}
 
 	multiHandcraft := new(models.MultipleBelanja)
+	if request.Search != nil {
+		multiHandcraft.FilterBySearch(*request.Search)
+	}
 
 	claims := middlewares.GetClaims(c)
 	if claims.ID == "" {
 		multiHandcraft.FilterOnlyActive()
 	}
 
-	if request.Search != nil {
-		multiHandcraft.FilterBySearch(*request.Search)
-	}
 	if claims.Role != 0 {
 		multiHandcraft.FilterByAuthorID(claims.ID)
 	}

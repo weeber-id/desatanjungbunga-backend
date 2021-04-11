@@ -83,15 +83,15 @@ func GetMultiple(c *gin.Context) {
 	}
 
 	articles := new(models.Articles)
+	if request.Search != nil {
+		articles.FilterBySearch(*request.Search)
+	}
 
 	claims := middlewares.GetClaims(c)
 	if claims.ID == "" {
 		articles.FilterOnlyActive()
 	}
 
-	if request.Search != nil {
-		articles.FilterBySearch(*request.Search)
-	}
 	if claims.Role != 0 {
 		articles.FilterByAuthorID(claims.ID)
 	}

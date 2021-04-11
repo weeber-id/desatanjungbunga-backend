@@ -78,15 +78,15 @@ func GetMultiple(c *gin.Context) {
 	}
 
 	multiTravel := new(models.MultipleWisata)
+	if request.Search != nil {
+		multiTravel.FilterBySearch(*request.Search)
+	}
 
 	claims := middlewares.GetClaims(c)
 	if claims.ID == "" {
 		multiTravel.FilterOnlyActive()
 	}
 
-	if request.Search != nil {
-		multiTravel.FilterBySearch(*request.Search)
-	}
 	if claims.Role != 0 {
 		multiTravel.FilterByAuthorID(claims.ID)
 	}

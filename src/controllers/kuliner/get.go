@@ -62,15 +62,15 @@ func GetMultiple(c *gin.Context) {
 	c.BindQuery(&request)
 
 	multiKuliner := new(models.MultipleKuliner)
+	if request.Search != nil {
+		multiKuliner.FilterBySearch(*request.Search)
+	}
 
 	claims := middlewares.GetClaims(c)
 	if claims.ID == "" {
 		multiKuliner.FilterOnlyActive()
 	}
 
-	if request.Search != nil {
-		multiKuliner.FilterBySearch(*request.Search)
-	}
 	if claims.Role != 0 {
 		multiKuliner.FilterByAuthorID(claims.ID)
 	}
