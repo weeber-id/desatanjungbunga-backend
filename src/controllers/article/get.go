@@ -139,7 +139,7 @@ func GetSearchInline(c *gin.Context) {
 		wg      sync.WaitGroup
 		request struct {
 			Search         *string `form:"search"`
-			SortTitle      *string `form:"sort_title"`
+			SortTitle      *string `form:"sort_title,default=desc"`
 			SortDate       *string `form:"sort_date"`
 			Page           *int    `form:"page"`
 			ContentPerPage *int    `form:"content_per_page"`
@@ -176,13 +176,21 @@ func GetSearchInline(c *gin.Context) {
 		lodgings.SortByName(*request.SortTitle)
 		travels.SortByName(*request.SortTitle)
 	}
+
 	if request.SortDate != nil {
 		articles.SortByDate(*request.SortDate)
 		culinaries.SortByDate(*request.SortDate)
 		handcrafts.SortByDate(*request.SortDate)
 		lodgings.SortByDate(*request.SortDate)
 		travels.SortByDate(*request.SortDate)
+	} else {
+		articles.SortByDate("desc")
+		culinaries.SortByDate("desc")
+		handcrafts.SortByDate("desc")
+		lodgings.SortByDate("desc")
+		travels.SortByDate("desc")
 	}
+
 	if request.Page != nil && request.ContentPerPage != nil {
 		articles.FilterByPaginate(*request.Page, *request.ContentPerPage)
 		culinaries.FilterByPaginate(*request.Page, *request.ContentPerPage)
